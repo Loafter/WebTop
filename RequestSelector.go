@@ -9,7 +9,7 @@ func (requestSelector *RequestSelector) Dispatch(request Request) bool {
 }
 
 func (requestSelector *RequestSelector) Init(request Request) {
-	requestSelector.selectorRequestMap = map[int]RequestDispatcher
+	requestSelector.selectorRequestMap = make(map[int]RequestDispatcher)
 }
 
 /*func (requestSelector *RequestSelector) Init(){
