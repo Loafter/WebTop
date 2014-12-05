@@ -10,12 +10,5 @@ func (requestSelector *RequestSelector) Dispatch(request Request) bool {
 
 func (requestSelector *RequestSelector) Init(request Request) {
 	requestSelector.selectorRequestMap = make(map[int]RequestDispatcher)
+	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceState)
 }
-
-/*func (requestSelector *RequestSelector) Init(){
-	requestSelector.selectorReqestMap = map[int]RequestDispatcher
-	requestSelector.selectorReqestMap[0] = RequestDispatcher{}
-	p.selectorReqestMap = elements
-	return p
-}
-*/
