@@ -4,5 +4,11 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Hello World!")
+	fmt.Println("Start!")
+
+	requestSelector := RequestSelector{}
+	if err := requestSelector.Dispatch(ServiceStateStatus{}); err {
+		fmt.Println("Dispatch error")
+	}
+
 }

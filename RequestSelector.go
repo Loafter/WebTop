@@ -5,10 +5,10 @@ type RequestSelector struct {
 }
 
 func (requestSelector *RequestSelector) Dispatch(request Request) bool {
-	return true
+	return false
 }
 
-func (requestSelector *RequestSelector) Init(request Request) {
+func (requestSelector *RequestSelector) Init() {
 	requestSelector.selectorRequestMap = make(map[int]RequestDispatcher)
-	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceState)
+	requestSelector.selectorRequestMap[ServiceStatus] = ServiceState{}
 }
