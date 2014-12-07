@@ -7,6 +7,7 @@ func main() {
 	fmt.Println("Start!")
 
 	requestSelector := RequestSelector{}
+	requestSelector.Init()
 	if err := requestSelector.Dispatch(ServiceStateStatus{}); err {
 		fmt.Println("Dispatch error")
 	}
