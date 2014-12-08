@@ -6,6 +6,7 @@ const (
 	ServiceStatus = iota
 )
 
+//basic http request with writer
 type BasicRequest struct {
 	Type           int
 	ResponseWriter http.ResponseWriter
