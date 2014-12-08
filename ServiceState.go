@@ -1,11 +1,15 @@
 package main
 
 import "fmt"
+import "sync"
 
 type ServiceState struct {
+	mutex sync.Mutex
 }
 
-func (requestSelector ServiceState) Dispatch(request Request) bool {
-	fmt.Println("Service status checked")
+func (serviceState ServiceState) Dispatch(request Request) bool {
+	serviceState.mutex.Lock()
+	fmt.Println("Service status checked ")
+	serviceState.mutex.Unlock()
 	return false
 }
