@@ -2,5 +2,5 @@
 package main
 
 type RequestDispatcher interface {
-	Dispatch(request Request) bool
+	Dispatch(request Request) error
 }

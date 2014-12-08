@@ -1,11 +1,15 @@
 package main
 
+import "net/http"
+
 const (
 	ServiceStatus = iota
 )
 
 type BasicRequest struct {
-	Type int
+	Type           int
+	ResponseWriter http.ResponseWriter
+	Request        *http.Request
 }
 
 type Request interface {

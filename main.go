@@ -10,9 +10,9 @@ func main() {
 	requestSelector := RequestSelector{}
 	requestSelector.Init()
 
-	if err := requestSelector.Dispatch(ServiceStateStatus{}); err {
-		fmt.Println("Dispatch error")
-	}
+	//if err := requestSelector.Dispatch(ServiceStateStatus{}); err {
+	//	fmt.Println("Dispatch error")
+	//}
 	time.Sleep(4000)
 
 }
