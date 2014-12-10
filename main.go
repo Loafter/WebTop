@@ -5,10 +5,13 @@ import "fmt"
 import "time"
 
 func main() {
-	fmt.Println("Start!")
+
 	topJson := TopJsonService{}
-	listenPort := 9999
-	topJson.Start(listenPort)
-	time.Sleep(40000)
+	listenPort := 9977
+	if err := topJson.Start(listenPort); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Web service start success")
+	time.Sleep(400000)
 
 }

@@ -14,14 +14,12 @@ func (requestSelector *RequestSelector) Dispatch(request Request) error {
 	} else {
 		return selector.Dispatch(request)
 	}
-
 }
 
 func (requestSelector *RequestSelector) Init() error {
 	//create map
 	requestSelector.selectorRequestMap = make(map[int]RequestDispatcher)
-	requestSelector.selectorRequestMap[ServiceStatus] = ServiceState{}
-
+	requestSelector.selectorRequestMap[ServiceStatus] = ServiceStateDispatcher{}
 	if requestSelector.selectorRequestMap == nil {
 		return errors.New("Can't create map")
 	}

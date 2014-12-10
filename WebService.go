@@ -1,9 +1,7 @@
 package main
 
 import (
-	//	"fmt"
-	//	"log"
-	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
@@ -19,6 +17,8 @@ type TopJsonService struct {
 func (serviceState *TopJsonService) Start(listenPort int) error {
 	serviceState.requestSelector = RequestSelector{}
 	serviceState.requestSelector.Init()
+	fmt.Println(":" + strconv.Itoa(listenPort))
+
 	http.HandleFunc("/", serviceState.ServeHTTP)
 	retVal := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil)
 	return retVal
@@ -26,12 +26,5 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 
 //serve http responce in different thread
 func (serviceState *TopJsonService) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
-	profile := "Test"
-	js, err := json.Marshal(profile)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.Write(js)
+	serviceState.requestSelector.Dispatch(ServiceStateRequest{BasicRequest{ServiceStatus, responseWriter, request}})
 }
