@@ -6,13 +6,9 @@ import "time"
 
 func main() {
 	fmt.Println("Start!")
-
-	requestSelector := RequestSelector{}
-	requestSelector.Init()
-
-	//if err := requestSelector.Dispatch(ServiceStateStatus{}); err {
-	//	fmt.Println("Dispatch error")
-	//}
-	time.Sleep(4000)
+	topJson := TopJsonService{}
+	listenPort := 9999
+	topJson.Start(listenPort)
+	time.Sleep(40000)
 
 }
