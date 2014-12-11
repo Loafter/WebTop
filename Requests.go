@@ -4,6 +4,7 @@ import "net/http"
 
 const (
 	ServiceStatus = iota
+	SystemMonitor
 )
 
 //basic http request with writer
