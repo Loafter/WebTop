@@ -12,7 +12,7 @@ type ServiceStateResponse struct {
 type ServiceStateDispatcher struct {
 }
 
-func (serviceStateDispatcher ServiceStateDispatcher) Dispatch(request Request) error {
+func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request) error {
 	//this is service is not need lock
 	req := request.(ServiceStateRequest)
 	serviceState := ServiceStateResponse{time.Now(), true}

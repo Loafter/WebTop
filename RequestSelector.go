@@ -19,7 +19,7 @@ func (requestSelector *RequestSelector) Dispatch(request Request) error {
 func (requestSelector *RequestSelector) Init() error {
 	//create map
 	requestSelector.selectorRequestMap = make(map[int]RequestDispatcher)
-	requestSelector.selectorRequestMap[ServiceStatus] = ServiceStateDispatcher{}
+	requestSelector.selectorRequestMap[ServiceStatus] = &ServiceStateDispatcher{}
 	if requestSelector.selectorRequestMap == nil {
 		return errors.New("Can't create map")
 	}
