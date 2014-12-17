@@ -2,12 +2,11 @@ package main
 
 import (
 	"net/http"
-	"syscall"
+	//"syscall"
 )
 import "encoding/json"
 
 type SystemMonitorResponse struct {
-	syscall.
 }
 
 type SystemMonitorDispatcher struct {
@@ -16,8 +15,8 @@ type SystemMonitorDispatcher struct {
 func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request) error {
 	//this is service is not need lock
 	req := request.(ServiceStateRequest)
-	systemInfo := SystemMonitorResponse{syscall.Sysinfo_t{}}
-	js, err := json.Marshal(serviceState)
+	systemInfo := "" //SystemMonitorResponse{syscall.Sysinfo_t{}}
+	js, err := json.Marshal(systemInfo)
 	if err != nil {
 		http.Error(req.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
