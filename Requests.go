@@ -22,6 +22,10 @@ type ServiceStateRequest struct {
 	BasicRequest
 }
 
+type SystemStateRequest struct {
+	BasicRequest
+}
+
 func (basicRequest BasicRequest) RequestType() int {
 	return ServiceStatus
 }
