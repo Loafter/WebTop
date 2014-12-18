@@ -1,7 +1,5 @@
 package main
 
-import "net/http"
-
 const (
 	ServiceStatus = iota
 	SystemMonitor
@@ -13,9 +11,11 @@ type Request interface {
 }
 
 type BasicRequest struct {
-	Type           int
-	ResponseWriter http.ResponseWriter
-	Request        *http.Request
+	Type int
+}
+
+func (basicRequest BasicRequest) RequestType() int {
+	return ServiceStatus
 }
 
 type ServiceStateRequest struct {
@@ -24,8 +24,4 @@ type ServiceStateRequest struct {
 
 type SystemStateRequest struct {
 	BasicRequest
-}
-
-func (basicRequest BasicRequest) RequestType() int {
-	return ServiceStatus
 }

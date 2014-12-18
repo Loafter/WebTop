@@ -25,12 +25,17 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 	return retVal
 }
 
-//serve http responce in different thread
-func (serviceState *TopJsonService) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
-	serviceState.requestSelector.Dispatch(ServiceStateRequest{BasicRequest{ServiceStatus, responseWriter, request}})
-}
+//parse json message
+//func (serviceState TopJsonService) parseJson(request *http.Request) error {
+
+//}
 
 //serve http responce in different thread
+func (serviceState *TopJsonService) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
+	serviceState.requestSelector.Dispatch(ServiceStateRequest{BasicRequest{ServiceStatus}}, responseWriter, request)
+}
+
+//serve main page request
 func (serviceState *TopJsonService) ServePage(responseWriter http.ResponseWriter, request *http.Request) {
 	responseWriter.Header().Set("Content-Type: text/html", "*")
 	content, err := ioutil.ReadFile("index.html")

@@ -13,20 +13,20 @@ type SystemMonitorResponse struct {
 type SystemMonitorDispatcher struct {
 }
 
-func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request) error {
+func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	//this is service is not need lock
-	req := request.(SystemStateRequest)
+	//req := request.(SystemStateRequest)
 	systemInfo := SystemMonitorResponse{}
 	if err := syscall.Sysinfo(&systemInfo.Sysinfo_t); err == nil {
-		http.Error(req.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
 	js, err := json.Marshal(systemInfo)
 	if err != nil {
-		http.Error(req.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	req.ResponseWriter.Header().Set("Content-Type", "application/json")
-	req.ResponseWriter.Write(js)
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.Write(js)
 	return nil
 }

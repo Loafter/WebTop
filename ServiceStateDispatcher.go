@@ -12,16 +12,15 @@ type ServiceStateResponse struct {
 type ServiceStateDispatcher struct {
 }
 
-func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request) error {
+func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	//this is service is not need lock
-	req := request.(ServiceStateRequest)
 	serviceState := ServiceStateResponse{time.Now(), true}
 	js, err := json.Marshal(serviceState)
 	if err != nil {
-		http.Error(req.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	req.ResponseWriter.Header().Set("Content-Type", "application/json")
-	req.ResponseWriter.Write(js)
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.Write(js)
 	return nil
 }
