@@ -25,22 +25,27 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 }
 
 //parse json message
-func parseJsonRequest(request *http.Request) (*BasicRequest, error) {
+func parseJsonRequest(request *http.Request) (Request, error) {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return nil, errors.New("Can't read request body")
 	}
-	var basicRequest BasicRequest
-	err = json.Unmarshal(body, &basicRequest)
+	var reqData Request
+	err = json.Unmarshal(body, reqData)
 	if err != nil {
 		return nil, errors.New("Can't parse json")
 	}
-	return &basicRequest, nil
+	return reqData, nil
 }
 
 //serve http responce in different thread
 func (service *TopJsonService) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
-	service.requestSelector.Dispatch(ServiceStateRequest{BasicRequest{ServiceStatus}}, responseWriter, request)
+	if reqData, err := parseJsonRequest(request); err == nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	} else {
+		service.requestSelector.Dispatch(reqData, responseWriter, request)
+	}
+
 }
 
 //serve main page request
