@@ -1,23 +1,22 @@
+<!doctype html>
 <html>
-  <head>
-    <title>Sample "Hello, World" Application</title>
-  </head>
-  <body bgcolor=white>
-
-    <table border="0" cellpadding="10">
-      <tr>
-        <td>
-          <h1>Sample "Hello, World" Application</h1>
-        </td>
-      </tr>
-    </table>
-
-    <p>This is the home page for the HelloWorld Web application. </p>
-    <p>To prove that they work, you can execute either of the following links:
-    <ul>
-      <li>To a <a href="hello.jsp">JSP page</a>.
-      <li>To a <a href="hello">servlet</a>.
-    </ul>
-
-  </body>
+	<head>
+		<meta charset="utf-8">
+		<title>Demo</title>
+	</head>
+<body>
+	<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script>
+		$( document ).ready(function() {
+			$.getJSON( "/", { Type: "0" } )
+			.done(function( json ) {
+				console.log( "JSON Data: " + json.users[ 3 ].name );
+				})
+			.fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ", " + error;
+				console.log( "Request Failed: " + err );
+				});
+		});
+	</script>
+</body>
 </html>
