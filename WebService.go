@@ -17,7 +17,7 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 	serviceState.requestSelector = RequestSelector{}
 	serviceState.requestSelector.Init()
 	fmt.Println(":" + strconv.Itoa(listenPort))
-	http.HandleFunc("/", serviceState.ServeHTTP)
+	http.HandleFunc("/webtop", serviceState.ServeHTTP)
 	http.HandleFunc("/index.html", serviceState.ServePage)
 	http.HandleFunc("/samplejson", serviceState.ReturnDummyReq)
 	retVal := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil)

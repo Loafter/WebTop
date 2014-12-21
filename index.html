@@ -1,4 +1,3 @@
-<!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -7,16 +6,14 @@
 <body>
 	<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
 	<script>
-		$( document ).ready(function() {
-			$.getJSON( "/", { Type: "0" } )
-			.done(function( json ) {
-				console.log( "JSON Data: " + json.users[ 3 ].name );
-				})
-			.fail(function( jqxhr, textStatus, error ) {
-			var err = textStatus + ", " + error;
-				console.log( "Request Failed: " + err );
-				});
-		});
+		$(document).ready(function() {
+			alert('just load');
+			$.ajax({
+			dataType: "json",
+			url: "/webtop",
+			data: '{"Type":0}'
+			});
+		})
 	</script>
 </body>
 </html>
