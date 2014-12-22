@@ -5,7 +5,6 @@ import "fmt"
 import "time"
 
 func main() {
-
 	topJson := TopJsonService{}
 	listenPort := 9977
 	if err := topJson.Start(listenPort); err != nil {
