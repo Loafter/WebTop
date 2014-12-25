@@ -40,7 +40,7 @@ func parseJsonRequest(request *http.Request) (Request, error) {
 
 //serve http responce in different thread
 func (service *TopJsonService) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
-	if reqData, err := parseJsonRequest(request); err == nil {
+	if reqData, err := parseJsonRequest(request); err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	} else {
 		service.requestSelector.Dispatch(reqData, responseWriter, request)

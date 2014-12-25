@@ -11,7 +11,7 @@
 			$.ajax({
 			dataType: "json",
 			url: "/webtop",
-			data: '{"Type":0}'
+			body: JSON.stringify({Type:0})
 			});
 		})
 	</script>
