@@ -8,11 +8,7 @@
 	<script>
 		$(document).ready(function() {
 			alert('just load');
-			$.ajax({
-			dataType: "json",
-			url: "/webtop",
-			body: JSON.stringify({Type:0})
-			});
+			$.getJSON("/webtop",{Type:0});
 		})
 	</script>
 </body>
