@@ -7,6 +7,10 @@ import "net/http"
 import "strconv"
 import "encoding/json"
 
+type test_struct struct {
+	Test string
+}
+
 //main service class
 type TopJsonService struct {
 	requestSelector RequestSelector
@@ -28,15 +32,31 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 func parseJsonRequest(request *http.Request) (Request, error) {
 	bodyData, err := ioutil.ReadAll(request.Body)
 	if err != nil {
-		return nil, errors.New("Can't read request body")
+		return nil, errors.New("Can't read request body \n " + err.Error())
 	}
-	fmt.Println(request)
-	var reqData Request
-	err = json.Unmarshal(bodyData, reqData)
+
+	var basicRequest BasicRequest
+	err = json.Unmarshal(bodyData, &basicRequest)
 	if err != nil {
-		return nil, errors.New("Can't parse json")
+		return nil, errors.New("error: Can't parse basic data \n " + err.Error())
 	}
-	return reqData, nil
+	switch basicRequest.Type {
+	case ServiceStatus:
+		var serviceStateRequest ServiceStateRequest
+		err := json.Unmarshal(bodyData, &serviceStateRequest)
+		if err != nil {
+			return nil, errors.New("error: Can't parse service state request \n " + err.Error())
+		}
+		return serviceStateRequest, nil
+	case SystemMonitor:
+		var systemStateRequest SystemStateRequest
+		err := json.Unmarshal(bodyData, &systemStateRequest)
+		if err != nil {
+			return nil, errors.New("error: Can't parse system state request \n " + err.Error())
+		}
+		return systemStateRequest, nil
+	}
+	return nil, errors.New("error: Unknown request type")
 }
 
 //serve http responce in different thread
@@ -54,7 +74,7 @@ func (service *TopJsonService) ServePage(responseWriter http.ResponseWriter, req
 	responseWriter.Header().Set("Content-Type: text/html", "*")
 	content, err := ioutil.ReadFile("index.html")
 	if err != nil {
-		responseWriter.Write([]byte("Can't find start page"))
+		responseWriter.Write([]byte("error: Can't find start page \n " + err.Error()))
 		return
 	}
 	responseWriter.Write(content)
@@ -62,7 +82,7 @@ func (service *TopJsonService) ServePage(responseWriter http.ResponseWriter, req
 
 func (service *TopJsonService) ReturnDummyReq(responseWriter http.ResponseWriter, request *http.Request) {
 	//this is service is not need lock
-	serviceState := ServiceStateRequest{}
+	serviceState := ServiceStateRequest{BasicRequest{1}}
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
