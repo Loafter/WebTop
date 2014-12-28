@@ -7,6 +7,7 @@ import "encoding/json"
 type ServiceStateResponse struct {
 	CurrentTime  time.Time
 	ServiceState bool
+	WorkFromRoot bool
 }
 
 type ServiceStateDispatcher struct {
