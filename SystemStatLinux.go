@@ -6,18 +6,18 @@
 
 package main
 
-import (
-	"bufio"
-	"bytes"
-	"io"
-	"io/ioutil"
-	"log"
-	"runtime"
-	"strconv"
-	"strings"
-	"syscall"
-	"time"
-)
+import "bufio"
+import "bytes"
+import "io"
+import "io/ioutil"
+import "log"
+import "runtime"
+import "strconv"
+import "strings"
+import "syscall"
+import "time"
+
+//import "errors"
 
 func getUptime(procfile string) (uptime UptimeSample) {
 	// read in whole uptime file with cpu usage information ;"/proc/uptime"

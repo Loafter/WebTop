@@ -4,9 +4,7 @@
 
 package main
 
-import (
-	"time"
-)
+import "time"
 
 // CPUSample is an object that represents the breakdown of time spent by the
 // CPU in various types of tasks. Two CPUSamples are required to find the
