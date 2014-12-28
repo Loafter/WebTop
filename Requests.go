@@ -11,11 +11,11 @@ type Request interface {
 }
 
 type BasicRequest struct {
-	Type int
+	Type int `json:"Type,string,omitempty"`
 }
 
 func (basicRequest BasicRequest) RequestType() int {
-	return ServiceStatus
+	return basicRequest.Type
 }
 
 type ServiceStateRequest struct {
