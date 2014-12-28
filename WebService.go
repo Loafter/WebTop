@@ -26,13 +26,12 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 
 //parse json message
 func parseJsonRequest(request *http.Request) (Request, error) {
-	bodyData, err := ioutil.ReadAll(request.Body)
+	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return nil, errors.New("Can't read request body")
 	}
-	fmt.Println(request)
 	var reqData Request
-	err = json.Unmarshal(bodyData, reqData)
+	err = json.Unmarshal(body, reqData)
 	if err != nil {
 		return nil, errors.New("Can't parse json")
 	}
