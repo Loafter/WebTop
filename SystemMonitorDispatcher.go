@@ -1,24 +1,23 @@
 package main
 
 import "net/http"
-import "syscall"
 import "encoding/json"
+import "sync"
 
 type SystemMonitorResponse struct {
-	syscall.Sysinfo_t
+	CpuSample CPUSample
+	MemSample MemSample
 }
 
 type SystemMonitorDispatcher struct {
+	accessMutes sync.Mutex
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
-	//this is service is not need lock
-	//req := request.(SystemStateRequest)
-	systemInfo := SystemMonitorResponse{}
-	if err := syscall.Sysinfo(&systemInfo.Sysinfo_t); err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
+	//this is service need lock
+	serviceStateDispatcher.accessMutes.Lock()
+	defer serviceStateDispatcher.accessMutes.Unlock()
+	systemInfo := SystemMonitorResponse{CpuSample: GetCPUSample(), MemSample: GetMemSample()}
 	js, err := json.Marshal(systemInfo)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)

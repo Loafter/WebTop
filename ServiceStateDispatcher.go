@@ -15,7 +15,7 @@ type ServiceStateDispatcher struct {
 
 func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	//this is service is not need lock
-	serviceState := ServiceStateResponse{time.Now(), true}
+	serviceState := ServiceStateResponse{time.Now(), true, true}
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
