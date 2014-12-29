@@ -1,13 +1,13 @@
 package main
 
-import "time"
 import "net/http"
 import "encoding/json"
 
 type ServiceStateResponse struct {
-	CurrentTime  time.Time
-	ServiceState bool
+	UpTime       bool
 	WorkFromRoot bool
+	ProcStat     bool
+	MemInfo      bool
 }
 
 type ServiceStateDispatcher struct {
@@ -15,7 +15,7 @@ type ServiceStateDispatcher struct {
 
 func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	//this is service is not need lock
-	serviceState := ServiceStateResponse{time.Now(), true, true}
+	serviceState := ServiceStateResponse{true, true, true, true}
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
