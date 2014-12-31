@@ -107,25 +107,50 @@
 			chart.addTimeSeries(memData, {lineWidth:2,strokeStyle:'#b0afc3',fillStyle:'rgba(212,127,146,0.30)'});
         	chart.streamTo(document.getElementById("cpu-mem-chart"));
     	}
+		
 		function updateChart() {
+			var lastCpuData={Total:0,Idle:0};
 			$.ajax({
         		url: "/webtop",
         		type: "POST",
         		data: '{\"Type\": \"1\"}',
         		dataType: "json"
-			}).done(function( jsonData ) {
-				var cpuLoad=((jsonData.CpuSample.User+jsonData.CpuSample.System+jsonData.CpuSample.Nice)/jsonData.CpuSample.Total)*100
-				var MemLoad=((jsonData.MemSample.MemUsed)/jsonData.MemSample.MemTotal)*100
+			}).done(function(jsonData ){
+				
+				//var cpuLoad=jsonData.CPUUsage.UserPct*100;
+				var MemLoad=((jsonData.MemSample.MemUsed)/jsonData.MemSample.MemTotal)*100;
+				lastCpuData=jsonData.CpuSample;
       			//cpuData.append(new Date().getTime(), cpuLoad);
     			memData.append(new Date().getTime(), MemLoad);
 			})
-			
-			//cpuData.append(new Date().getTime(), Math.random() * 10000);
-			//memData.append(new Date().getTime(), Math.random() * 10000);
 		}	
+		
+		function updateStatistic() {
+			var lastCpuData={Total:0,Idle:0};
+			$.ajax({
+        		url: "/webtop",
+        		type: "POST",
+        		data: '{\"Type\": \"1\"}',
+        		dataType: "json"
+			}).done(function(jsonData ){
+				//cpu table
+				$("#system-load-cpu").text(jsonData.CPUUsage.SystemPct.toFixed(1)+' %');
+				$("#idle-load-cpu").text(jsonData.CPUUsage.IdlePct.toFixed(1)+' %');
+				$("#guest-load-cpu").text(jsonData.CPUUsage.GuestPct.toFixed(1)+' %');
+				$("#low-load-cpu").text(jsonData.CPUUsage.IowaitPct.toFixed(1)+' %');
+				$("#user-load-cpu").text(jsonData.CPUUsage.UserPct.toFixed(1)+' %');
+				//mem table	
+				$("#buffers-mem").text((jsonData.MemSample.Buffers*0.000976562).toFixed(1)+' Mb')
+				$("#used-mem").text((jsonData.MemSample.MemUsed*0.000976562).toFixed(1)+' Mb')
+				$("#free-mem").text((jsonData.MemSample.MemFree*0.000976562).toFixed(1)+' Mb')
+				$("#total-mem").text((jsonData.MemSample.MemTotal*0.000976562).toFixed(1)+' Mb')
+				$("#cached-mem").text((jsonData.MemSample.Cached*0.000976562).toFixed(1)+' Mb')
+			})
+		}
 		function onDocumentLoad() {
 			createTimeline()
 			setInterval(updateChart, 500);
+			setInterval(updateStatistic, 700);
       	}
     </script>
   </head>
@@ -139,24 +164,23 @@
         <div class="row">
           <div class="col-md-4">
             <span class="label label-default">Cpu load</span>
-            <p>System:<span class="tab">10%</span></p>
-            <p>Idle:<span class="tab">10%</span></p>
-            <p>Guest:<span class="tab">10%</span></p>
-            <p>Low:<span class="tab">10%</span></p>
-            <p>User:<span class="tab">10%</span></p>
+            <p>System:<span class="tab" id="system-load-cpu">10%</span></p>
+            <p>Idle:<span class="tab" id="idle-load-cpu">10%</span></p>
+            <p>Guest:<span class="tab" id="guest-load-cpu">10%</span></p>
+            <p>Low:<span class="tab" id="low-load-cpu">10%</span></p>
+            <p>User:<span class="tab" id="user-load-cpu">10%</span></p>
           </div>
           <div class="col-md-4">
             <span class="label label-default">System info</span>
-            <p>Buffers:<span class="tab">10%</span></p>
-            <p>MemUsed:<span class="tab">10%</span></p>
-           
-            <p>MemFree:<span class="tab">10%</span></p>
-             <p>MemTotal:<span class="tab">10%</span></p>
-            <p>Cached:<span class="tab">10%</span></p>
+            <p>Memory used:<span class="tab" id="used-mem">10%</span></p>      
+            <p>Memory free:<span class="tab" id="free-mem">10%</span></p>
+           	<p>Buffers:<span class="tab" id="buffers-mem">10%</span></p>
+            <p>Cached:<span class="tab" id="cached-mem">10%</span></p>
+			 <p>Memory total:<span class="tab" id="total-mem">10%</span></p>
           </div>
           <div class="col-md-4">
             <span class="label label-default">Cpu graph</span>
-           <canvas id="cpu-mem-chart" width="220" height="*"></canvas>
+           <canvas id="cpu-mem-chart" width="218" height="138"></canvas>
           </div>
         </div>
       </div>
