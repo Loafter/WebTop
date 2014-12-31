@@ -1,10 +1,90 @@
+
+
+<!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Demo</title>
-	</head>
-<body>
-	<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+  
+  <head>
+    <title>WebTop</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
+    <style type="text/css">
+      /* Space out content a bit */
+      body {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      /* Everything but the jumbotron gets side spacing for mobile first views */
+      .header, .marketing, .footer {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+      /* Custom page header */
+      .header {
+        border-bottom: 1px solid #e5e5e5;
+      }
+      /* Make the masthead heading the same height as the navigation */
+      .header h3 {
+        margin-top: 0;
+        margin-bottom: 0;
+        line-height: 40px;
+        padding-bottom: 19px;
+      }
+      /* Custom page footer */
+      .footer {
+        padding-top: 19px;
+        color: #777;
+        border-top: 1px solid #e5e5e5;
+      }
+      /* Customize container */
+      @media(min-width: 768px) {
+        .container {
+          max-width: 730px;
+        }
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        text-align: center;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
+      /* Supporting marketing content */
+      .marketing {
+        margin: 40px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+      /* Responsive: Portrait tablets and up */
+      @media screen and(min-width: 768px) {
+        /* Remove the padding we set earlier */
+        .header, .marketing, .footer {
+          padding-left: 0;
+          padding-right: 0;
+        }
+        /* Space out the masthead */
+        .header {
+          margin-bottom: 30px;
+        }
+        /* Remove the bottom border on the jumbotron for visual effect */
+        .jumbotron {
+          border-bottom: 0;
+        }
+      }
+      span.tab {
+        float:right
+      }
+    </style>
+	
+	
 	<script>
 		/*$(document).ready(function() {
 			alert('just load');
@@ -16,5 +96,69 @@
 			})
 		})*/
 	</script>
-</body>
-</html>
+	
+	<script type="text/javascript">
+    	var cpuData=new TimeSeries();
+		var memData=new TimeSeries();
+		
+		function createTimeline() {
+        	var chart = new SmoothieChart({maxValue:100,minValue:0,millisPerPixel:100,grid:{fillStyle:'#3e444c'}});
+        	chart.addTimeSeries(cpuData, {lineWidth:2,strokeStyle:'#a0afc3',fillStyle:'rgba(112,127,146,0.30)'});
+			chart.addTimeSeries(memData, {lineWidth:2,strokeStyle:'#b0afc3',fillStyle:'rgba(212,127,146,0.30)'});
+        	chart.streamTo(document.getElementById("cpu-mem-chart"));
+    	}
+		function updateChart() {
+			$.ajax({
+        		url: "/webtop",
+        		type: "POST",
+        		data: '{\"Type\": \"1\"}',
+        		dataType: "json"
+			}).done(function( jsonData ) {
+				var cpuLoad=((jsonData.CpuSample.User+jsonData.CpuSample.System+jsonData.CpuSample.Nice)/jsonData.CpuSample.Total)*100
+				var MemLoad=((jsonData.MemSample.MemUsed)/jsonData.MemSample.MemTotal)*100
+      			//cpuData.append(new Date().getTime(), cpuLoad);
+    			memData.append(new Date().getTime(), MemLoad);
+			})
+			
+			//cpuData.append(new Date().getTime(), Math.random() * 10000);
+			//memData.append(new Date().getTime(), Math.random() * 10000);
+		}	
+		function onDocumentLoad() {
+			createTimeline()
+			setInterval(updateChart, 500);
+      	}
+    </script>
+  </head>
+  
+  <body onload="onDocumentLoad()">
+    <div class="container">
+      <h1>WebTop system monitor</h1>
+      <div class="panel-footer">System state
+      </div>
+      <div class="panel-body" data-ds-editmark="true">
+        <div class="row">
+          <div class="col-md-4">
+            <span class="label label-default">Cpu load</span>
+            <p>System:<span class="tab">10%</span></p>
+            <p>Idle:<span class="tab">10%</span></p>
+            <p>Guest:<span class="tab">10%</span></p>
+            <p>Low:<span class="tab">10%</span></p>
+            <p>User:<span class="tab">10%</span></p>
+          </div>
+          <div class="col-md-4">
+            <span class="label label-default">System info</span>
+            <p>Buffers:<span class="tab">10%</span></p>
+            <p>MemUsed:<span class="tab">10%</span></p>
+           
+            <p>MemFree:<span class="tab">10%</span></p>
+             <p>MemTotal:<span class="tab">10%</span></p>
+            <p>Cached:<span class="tab">10%</span></p>
+          </div>
+          <div class="col-md-4">
+            <span class="label label-default">Cpu graph</span>
+           <canvas id="cpu-mem-chart" width="220" height="*"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
