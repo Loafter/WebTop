@@ -84,18 +84,7 @@
       }
     </style>
 	
-	
-	<script>
-		/*$(document).ready(function() {
-			alert('just load');
-			$.ajax({
-        		url: "/webtop",
-        		type: "POST",
-        		data: '{\"Type\": \"1\"}',
-        		dataType: "json"
-			})
-		})*/
-	</script>
+
 	
 	<script type="text/javascript">
     	var cpuData=new TimeSeries();
@@ -154,8 +143,7 @@
       	}
     </script>
   </head>
-  
-  <body onload="onDocumentLoad()">
+<body onload="onDocumentLoad()">
     <div class="container">
       <h1>WebTop system monitor</h1>
       <div class="panel-footer">System state
@@ -172,17 +160,39 @@
           </div>
           <div class="col-md-4">
             <span class="label label-default">System info</span>
-            <p>Memory used:<span class="tab" id="used-mem">10%</span></p>      
+            <p>Memory used:<span class="tab" id="used-mem">10%</span></p>
             <p>Memory free:<span class="tab" id="free-mem">10%</span></p>
-           	<p>Buffers:<span class="tab" id="buffers-mem">10%</span></p>
+            <p>Buffers:<span class="tab" id="buffers-mem">10%</span></p>
             <p>Cached:<span class="tab" id="cached-mem">10%</span></p>
-			 <p>Memory total:<span class="tab" id="total-mem">10%</span></p>
+            <p>Memory total:<span class="tab" id="total-mem">10%</span></p>
           </div>
           <div class="col-md-4">
             <span class="label label-default">Cpu graph</span>
-           <canvas id="cpu-mem-chart" width="218" height="138"></canvas>
+            <canvas id="cpu-mem-chart" width="218" height="138"></canvas>
           </div>
         </div>
       </div>
+      <div class="panel-footer">Process list
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Michael</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jake</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel-body" data-ds-editmark="true"></div>
     </div>
+  </body>
   </body>
