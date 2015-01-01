@@ -5,8 +5,8 @@ import "fmt"
 
 func main() {
 	top := new(Top)
-	top.GetProcessList()
-	fmt.Println("Web service start success")
+
+	fmt.Println(top.GetProcessList())
 
 	/*topJson := new(TopJsonService)
 	listenPort := 9977
