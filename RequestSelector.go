@@ -23,8 +23,8 @@ func (requestSelector *RequestSelector) Init() error {
 	if requestSelector.selectorRequestMap == nil {
 		return errors.New("error: Can't create map")
 	}
-	requestSelector.selectorRequestMap[ServiceStatus] = &ServiceStateDispatcher{}
-	requestSelector.selectorRequestMap[SystemMonitor] = &SystemMonitorDispatcher{}
+	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceStateDispatcher)
+	requestSelector.selectorRequestMap[SystemMonitor] = new(SystemMonitorDispatcher)
 
 	return nil
 }
