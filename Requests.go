@@ -3,6 +3,8 @@ package main
 const (
 	ServiceStatus = iota
 	SystemMonitor
+	TopProcess
+	KillProcess
 )
 
 //basic http request with writer
@@ -16,12 +18,4 @@ type BasicRequest struct {
 
 func (basicRequest BasicRequest) RequestType() int {
 	return basicRequest.Type
-}
-
-type ServiceStateRequest struct {
-	BasicRequest
-}
-
-type SystemStateRequest struct {
-	BasicRequest
 }

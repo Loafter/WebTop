@@ -3,6 +3,10 @@ package main
 import "net/http"
 import "encoding/json"
 
+type ServiceStateRequest struct {
+	BasicRequest
+}
+
 type ServiceStateResponse struct {
 	UpTime       bool
 	WorkFromRoot bool

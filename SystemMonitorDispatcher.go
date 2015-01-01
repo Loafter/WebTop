@@ -4,6 +4,10 @@ import "net/http"
 import "encoding/json"
 import "sync"
 
+type SystemStateRequest struct {
+	BasicRequest
+}
+
 type SystemMonitorResponse struct {
 	CPUUsage  CPUAverage
 	MemSample MemSample

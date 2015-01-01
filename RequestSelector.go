@@ -25,6 +25,8 @@ func (requestSelector *RequestSelector) Init() error {
 	}
 	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceStateDispatcher)
 	requestSelector.selectorRequestMap[SystemMonitor] = new(SystemMonitorDispatcher)
-
+	TopProcessDisp := new(SystemMonitorDispatcher)
+	requestSelector.selectorRequestMap[TopProcess] = TopProcessDisp
+	requestSelector.selectorRequestMap[KillProcess] = TopProcessDisp
 	return nil
 }
