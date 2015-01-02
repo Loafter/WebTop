@@ -87,7 +87,7 @@
 			function createTimeline() {
 			   	var chart = new SmoothieChart({maxValue:100,minValue:0,millisPerPixel:100,grid:{fillStyle:'#3e444c'}});
 			   	chart.addTimeSeries(cpuData, {lineWidth:2,strokeStyle:'#a0afc3',fillStyle:'rgba(112,127,146,0.30)'});
-			chart.addTimeSeries(memData, {lineWidth:2,strokeStyle:'#b0afc3',fillStyle:'rgba(212,127,146,0.30)'});
+				chart.addTimeSeries(memData, {lineWidth:2,strokeStyle:'#b0afc3',fillStyle:'rgba(212,127,146,0.30)'});
 			   	chart.streamTo(document.getElementById("cpu-mem-chart"));
 			}
 			
@@ -100,10 +100,10 @@
 			   		dataType: "json"
 			}).done(function(jsonData ){
 			
-			//var cpuLoad=jsonData.CPUUsage.UserPct*100;
+			var cpuLoad=jsonData.CPUUsage.UserPct;
 			var MemLoad=((jsonData.MemSample.MemUsed)/jsonData.MemSample.MemTotal)*100;
 			lastCpuData=jsonData.CpuSample;
-			 			//cpuData.append(new Date().getTime(), cpuLoad);
+			 		cpuData.append(new Date().getTime(), cpuLoad);
 					memData.append(new Date().getTime(), MemLoad);
 			})
 			}	
@@ -117,11 +117,11 @@
 			   		dataType: "json"
 			}).done(function(jsonData ){
 			//cpu table
+			$("#user-load-cpu").text(jsonData.CPUUsage.UserPct.toFixed(1)+' %');
 			$("#system-load-cpu").text(jsonData.CPUUsage.SystemPct.toFixed(1)+' %');
 			$("#idle-load-cpu").text(jsonData.CPUUsage.IdlePct.toFixed(1)+' %');
 			$("#guest-load-cpu").text(jsonData.CPUUsage.GuestPct.toFixed(1)+' %');
 			$("#low-load-cpu").text(jsonData.CPUUsage.IowaitPct.toFixed(1)+' %');
-			$("#user-load-cpu").text(jsonData.CPUUsage.UserPct.toFixed(1)+' %');
 			//mem table	
 			$("#buffers-mem").text((jsonData.MemSample.Buffers*0.000976562).toFixed(1)+' Mb')
 			$("#used-mem").text((jsonData.MemSample.MemUsed*0.000976562).toFixed(1)+' Mb')
@@ -146,11 +146,11 @@
 				<div class="row">
 					<div class="col-md-4">
 						<span class="label label-default">Cpu load</span>
+						<p>User:<span class="tab" id="user-load-cpu">10%</span></p>
 						<p>System:<span class="tab" id="system-load-cpu">10%</span></p>
 						<p>Idle:<span class="tab" id="idle-load-cpu">10%</span></p>
 						<p>Guest:<span class="tab" id="guest-load-cpu">10%</span></p>
 						<p>Low:<span class="tab" id="low-load-cpu">10%</span></p>
-						<p>User:<span class="tab" id="user-load-cpu">10%</span></p>
 					</div>
 					<div class="col-md-4">
 						<span class="label label-default">System info</span>

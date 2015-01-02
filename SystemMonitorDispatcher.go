@@ -20,6 +20,7 @@ type SystemMonitorDispatcher struct {
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) getCPUUsage() CPUAverage {
 	cpuAveragePer := GetCPUAverage(serviceStateDispatcher.lastCPUSample, GetCPUSample())
+	serviceStateDispatcher.lastCPUSample = GetCPUSample()
 	return cpuAveragePer
 }
 
