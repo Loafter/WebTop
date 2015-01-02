@@ -24,7 +24,9 @@ func (requestSelector *RequestSelector) Init() error {
 		return errors.New("error: Can't create map")
 	}
 	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceStateDispatcher)
-	requestSelector.selectorRequestMap[SystemMonitor] = new(SystemMonitorDispatcher)
+	systemMonitorDispatcher := new(SystemMonitorDispatcher)
+	systemMonitorDispatcher.StartMesure()
+	requestSelector.selectorRequestMap[SystemMonitor] = systemMonitorDispatcher
 	//same dispatcher for two message
 	TopProcessDisp := new(SystemMonitorDispatcher)
 	requestSelector.selectorRequestMap[TopProcess] = TopProcessDisp
