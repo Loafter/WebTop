@@ -11,7 +11,7 @@ type RequestSelector struct {
 func (requestSelector *RequestSelector) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	//I don't protect multiple read in different thread
 	if selector, contains := requestSelector.selectorRequestMap[request.RequestType()]; !contains {
-		return errors.New("Usupported message type")
+		return errors.New("error: Usupported message type")
 	} else {
 		return selector.Dispatch(request, responseWriter, httpRequest)
 	}

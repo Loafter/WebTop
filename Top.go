@@ -4,22 +4,24 @@ import "io/ioutil"
 import "testing"
 import "strconv"
 import "regexp"
+import "errors"
+
+import "fmt"
 
 //process info sructure
 type ProcessItem struct {
-	Pid     int
-	User    string
-	Virt    int
-	Cpu     float32
-	Memory  float32
-	Command string
+	Pid    int
+	Name   string
+	User   string
+	Cpu    float32
+	Memory float32
 }
 
 type Top struct {
 }
 
 //
-func (top *Top) getAllPids() (*[]ProcessItem, error) {
+func (top *Top) getAllPids() ([]ProcessItem, error) {
 	dirContent, err := ioutil.ReadDir("/proc/")
 	if err != nil {
 		return nil, err
@@ -32,22 +34,29 @@ func (top *Top) getAllPids() (*[]ProcessItem, error) {
 			process = append(process, ProcessItem{Pid: pid})
 		}
 	}
-	return &process, nil
+	return process, nil
 }
 
-func (top *Top) fillProcessInfo() (*[]ProcessItem, error) {
-
-	return nil, nil
+func (top *Top) fillProcessInfo(processItems []ProcessItem) {
+	for i, _ := range processItems {
+		statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(processItems[i].Pid) + "/status")
+		if err == nil {
+			reg := regexp.MustCompile("Name:\t(.*)")
+			processName := string(reg.Find(statFileData))
+			processItems[i].Name = processName
+		}
+	}
 }
 
 //
 func (top *Top) GetProcessList() ([]ProcessItem, error) {
-	processItemsRef, err := top.getAllPids()
+	processItemsSlice, err := top.getAllPids()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Can't read proc directory")
 	}
-	processItems := *processItemsRef
-	return processItems, nil
+	top.fillProcessInfo(processItemsSlice)
+	fmt.Println(processItemsSlice)
+	return processItemsSlice, nil
 }
 
 func (top *Top) KillProcess(pid int) error {
