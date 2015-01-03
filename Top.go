@@ -6,8 +6,6 @@ import "strconv"
 import "regexp"
 import "errors"
 
-import "fmt"
-
 //process info sructure
 type ProcessItem struct {
 	Pid    int
@@ -41,9 +39,12 @@ func (top *Top) fillProcessInfo(processItems []ProcessItem) {
 	for i, _ := range processItems {
 		statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(processItems[i].Pid) + "/status")
 		if err == nil {
-			reg := regexp.MustCompile("Name:\t(.*)")
-			processName := string(reg.Find(statFileData))
-			processItems[i].Name = processName
+			statFileStr := string(statFileData)
+			regName := regexp.MustCompile("Name:\t(.*)\n")
+			processItems[i].Name = regName.FindAllStringSubmatch(statFileStr, -1)[0][1]
+			regUid := regexp.MustCompile("Uid:\t(\\w+)")
+			user := regUid.FindAllStringSubmatch(statFileStr, -1)[0][1]
+			processItems[i].User = user
 		}
 	}
 }
@@ -55,7 +56,6 @@ func (top *Top) GetProcessList() ([]ProcessItem, error) {
 		return nil, errors.New("Can't read proc directory")
 	}
 	top.fillProcessInfo(processItemsSlice)
-	fmt.Println(processItemsSlice)
 	return processItemsSlice, nil
 }
 
