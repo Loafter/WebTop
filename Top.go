@@ -25,6 +25,7 @@ type Top struct {
 }
 
 func (top *Top) StartCollectInfo() error {
+	top.processItems = []ProcessItem{}
 	go top.collectInfo()
 	return nil
 }

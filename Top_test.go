@@ -7,18 +7,21 @@ import "time"
 func TestTop(t *testing.T) {
 	top := new(Top)
 	top.StartCollectInfo()
-	time.Sleep(600 * time.Millisecond)
+	//time.Sleep(600 * time.Millisecond)
 	//top.getAllPids()
-	processList, err := top.GetProcessList()
-
-	if processList == nil {
-		t.Errorf("GetProcessList return null ")
-		return
-	} else if err != nil {
-		t.Errorf("")
-		return
+	for i := 0; i < 10; i++ {
+		processList, err := top.GetProcessList()
+		time.Sleep(100 * time.Millisecond)
+		if processList == nil {
+			t.Errorf("GetProcessList return null ")
+			return
+		} else if err != nil {
+			t.Errorf("")
+			return
+		}
+		fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
+		fmt.Println(processList)
+		fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
 	}
-	fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
-	fmt.Println(processList)
-	fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
+
 }
