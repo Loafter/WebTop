@@ -5,6 +5,7 @@ import "testing"
 import "strconv"
 import "regexp"
 import "errors"
+import "fmt"
 
 //process info sructure
 type ProcessItem struct {
@@ -12,7 +13,7 @@ type ProcessItem struct {
 	Name   string
 	User   string
 	Cpu    float32
-	Memory float32
+	Memory int
 }
 
 type Top struct {
@@ -43,8 +44,14 @@ func (top *Top) fillProcessInfo(processItems []ProcessItem) {
 			regName := regexp.MustCompile("Name:\t(.*)\n")
 			processItems[i].Name = regName.FindAllStringSubmatch(statFileStr, -1)[0][1]
 			regUid := regexp.MustCompile("Uid:\t(\\w+)")
-			user := regUid.FindAllStringSubmatch(statFileStr, -1)[0][1]
-			processItems[i].User = user
+			processItems[i].User = regUid.FindAllStringSubmatch(statFileStr, -1)[0][1]
+			regMem := regexp.MustCompile("VmRSS:\\s(\\d+)")
+			if regMem.MatchString(statFileStr) == true {
+				fmt.Printf("Match ")
+			} else {
+				fmt.Printf("No match ")
+			}
+			//processItems[i].User = regMem.FindAllStringSubmatch(statFileStr, -1)[0][0]
 		}
 	}
 }
