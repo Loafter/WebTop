@@ -1,14 +1,13 @@
 package main
 
 import "io/ioutil"
-import "testing"
 import "strconv"
 import "regexp"
 import "errors"
 import "time"
+import "sync"
 
 //import "fmt"
-import "sync"
 
 //process info sructure
 type ProcessItem struct {
@@ -17,6 +16,11 @@ type ProcessItem struct {
 	User   string
 	Cpu    float32
 	Memory int
+}
+
+type Timeval struct {
+	Sec  int32
+	Usec int32
 }
 
 type Top struct {
@@ -34,14 +38,27 @@ func (top *Top) StopCollectInfo() error {
 }
 
 func (top *Top) getTicksbyPid(pid int) (int64, error) {
-	return 0, nil
+	statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
+	if err != nil {
+		return 0, errors.New("error: problem with read proc filesystem")
+	}
+	statFileStr := string(statFileData)
+	cpuTimeReg := regexp.MustCompile("\\d+")
+	//fmt.Printf("pid=%v ", pid)
+	//fmt.Println(cpuTimeReg.FindAllString(statFileStr, -1))
+	utime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[11])
+	stime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[12])
+	cutime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[13])
+	cstime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[14])
+	sumTime := int64(utime + stime + cutime + cstime)
+	return sumTime, nil
 }
 
 func (top *Top) getTicksMap(pids []int) map[int]int64 {
 	ticksMap := make(map[int]int64)
 	for _, element := range pids {
 		ticks, err := top.getTicksbyPid(element)
-		if err == nil {
+		if err != nil {
 			ticksMap[element] = 0
 		}
 		ticksMap[element] = ticks
@@ -52,7 +69,7 @@ func (top *Top) collectInfo() error {
 	for {
 		pids, err := top.getAllPids()
 		if err != nil {
-			return errors.New("error: problem read proc filesystem")
+			return errors.New("error: problem with read proc filesystem")
 		}
 		StartTicks := top.getTicksMap(pids)
 		time.Sleep(500 * time.Millisecond)
@@ -95,14 +112,14 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64) 
 			processItem.Name = regName.FindAllStringSubmatch(statFileStr, -1)[0][1]
 			regUid := regexp.MustCompile("Uid:\t(\\w+)")
 			processItem.User = regUid.FindAllStringSubmatch(statFileStr, -1)[0][1]
+			regMem := regexp.MustCompile("VmRSS:\\s+(\\d+)")
+			if regMem.MatchString(statFileStr) {
+				intMem, _ := strconv.Atoi(regMem.FindAllStringSubmatch(statFileStr, -1)[0][1])
+				processItem.Memory = intMem
+			}
+			processItem.Cpu = float32(i)
+
 			processItems = append(processItems, processItem)
-			//regMem := regexp.MustCompile("VmRSS:\\s(\\d+)")
-			//if regMem.MatchString(statFileStr) == true {
-			//	fmt.Printf("Match ")
-			//} else {
-			//	fmt.Printf("No match ")
-			//}
-			//processItems[i].User = regMem.FindAllStringSubmatch(statFileStr, -1)[0][0]
 		}
 	}
 	return processItems
@@ -118,9 +135,4 @@ func (top *Top) GetProcessList() ([]ProcessItem, error) {
 func (top *Top) KillProcess(pid int) error {
 	//this is service is need lock
 	return nil
-}
-
-func TestGetProcessList(t *testing.T) {
-	top := new(Top)
-	top.GetProcessList()
 }

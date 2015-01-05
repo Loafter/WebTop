@@ -1,6 +1,7 @@
 package main
 
 import "testing"
+
 import "fmt"
 import "time"
 
@@ -9,7 +10,7 @@ func TestTop(t *testing.T) {
 	top.StartCollectInfo()
 	//time.Sleep(600 * time.Millisecond)
 	//top.getAllPids()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 1000; i++ {
 		processList, err := top.GetProcessList()
 		time.Sleep(100 * time.Millisecond)
 		if processList == nil {
@@ -21,7 +22,7 @@ func TestTop(t *testing.T) {
 		}
 		fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
 		fmt.Println(processList)
-		fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
+		//fmt.Println("_____________________________________________________________Process list_____________________________________________________________")
 	}
 
 }
