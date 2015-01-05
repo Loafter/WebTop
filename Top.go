@@ -7,8 +7,6 @@ import "errors"
 import "time"
 import "sync"
 
-//import "fmt"
-
 //process info sructure
 type ProcessItem struct {
 	Pid    int
@@ -44,8 +42,6 @@ func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	}
 	statFileStr := string(statFileData)
 	cpuTimeReg := regexp.MustCompile("\\d+")
-	//fmt.Printf("pid=%v ", pid)
-	//fmt.Println(cpuTimeReg.FindAllString(statFileStr, -1))
 	utime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[11])
 	stime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[12])
 	cutime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[13])
@@ -54,7 +50,8 @@ func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	return sumTime, nil
 }
 
-func (top *Top) getTicksMap(pids []int) map[int]int64 {
+func (top *Top) getTicksMap(pids []int) (map[int]int64, int64) {
+	var sum int64
 	ticksMap := make(map[int]int64)
 	for _, element := range pids {
 		ticks, err := top.getTicksbyPid(element)
@@ -62,8 +59,9 @@ func (top *Top) getTicksMap(pids []int) map[int]int64 {
 			ticksMap[element] = 0
 		}
 		ticksMap[element] = ticks
+		sum += ticks
 	}
-	return ticksMap
+	return ticksMap, sum
 }
 func (top *Top) collectInfo() error {
 	for {
@@ -71,12 +69,12 @@ func (top *Top) collectInfo() error {
 		if err != nil {
 			return errors.New("error: problem with read proc filesystem")
 		}
-		StartTicks := top.getTicksMap(pids)
+		StartTicks, sumOldTick := top.getTicksMap(pids)
 		time.Sleep(500 * time.Millisecond)
 		pids, _ = top.getAllPids()
-		EndTicks := top.getTicksMap(pids)
+		EndTicks, sumNewTick := top.getTicksMap(pids)
 		top.accessMutes.Lock()
-		top.processItems = top.fillProcessInfo(StartTicks, EndTicks)
+		top.processItems = top.fillProcessInfo(StartTicks, EndTicks, sumNewTick-sumOldTick)
 		top.accessMutes.Unlock()
 	}
 	defer top.accessMutes.Unlock()
@@ -100,9 +98,9 @@ func (top *Top) getAllPids() ([]int, error) {
 	return process, nil
 }
 
-func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64) []ProcessItem {
+func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, sumTicks int64) []ProcessItem {
 	processItems := []ProcessItem{}
-	for i, _ := range newTicks {
+	for i, newTickVal := range newTicks {
 		statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(i) + "/status")
 		if err == nil {
 			processItem := ProcessItem{}
@@ -117,8 +115,14 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64) 
 				intMem, _ := strconv.Atoi(regMem.FindAllStringSubmatch(statFileStr, -1)[0][1])
 				processItem.Memory = intMem
 			}
-			processItem.Cpu = float32(i)
+			oldTickVal, exist := oldTicks[i]
+			if exist {
 
+				processItem.Cpu = float32(float64(newTickVal-oldTickVal) / float64(sumTicks))
+
+			} else {
+				processItem.Cpu = 0
+			}
 			processItems = append(processItems, processItem)
 		}
 	}
