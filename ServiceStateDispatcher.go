@@ -2,6 +2,7 @@ package main
 
 import "net/http"
 import "encoding/json"
+import "errors"
 
 type ServiceStateRequest struct {
 	BasicRequest
@@ -23,7 +24,7 @@ func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request, 
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return err
+		return errors.New("error: Can't service state response \n " + err.Error())
 	}
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Write(js)

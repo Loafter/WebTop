@@ -38,7 +38,7 @@ func (top *Top) StopCollectInfo() error {
 func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
 	if err != nil {
-		return 0, errors.New("error: problem with read proc filesystem")
+		return 0, errors.New("error: problem with read proc filesystem \n " + err.Error())
 	}
 	statFileStr := string(statFileData)
 	cpuTimeReg := regexp.MustCompile("\\d+")
@@ -68,7 +68,7 @@ func (top *Top) collectInfo() error {
 	for {
 		pids, err := top.getAllPids()
 		if err != nil {
-			return errors.New("error: problem with read proc filesystem")
+			return errors.New("error: problem with read proc filesystem \n " + err.Error())
 		}
 		StartTicks, sumOldTick := top.getTicksMap(pids)
 		time.Sleep(1000 * time.Millisecond)

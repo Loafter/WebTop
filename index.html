@@ -81,6 +81,7 @@
 			}
 		</style>
 		<script type="text/javascript">
+			var lastTopData=new Array();
 			var cpuData=new TimeSeries();
 			var memData=new TimeSeries();
 			
@@ -130,18 +131,34 @@
 			$("#cached-mem").text((jsonData.MemSample.Cached*0.000976562).toFixed(1)+' Mb')
 			})
 			}
+			
+			function updateTop() {
+			$.ajax({
+			url: "/webtop",
+			type: "POST",
+			data: '{\"Type\": \"2\"}',
+			dataType: "json"
+			}).done(function(jsonData ){
+				if(lastTopData.length==0){
+					var topDic = new Array();
+					for (index in jsonData.ProcessItems) {
+						topItems=jsonData.ProcessItems[index]
+						topDic.push({key: topItems.Pid,value: topItems});
+					}
+					lastTopData=topDic
+				} else {
+					
+				}
+			})
+			}
+			
 			function onDocumentLoad() {
-			createTimeline()
-			setInterval(updateChart, 500);
-			setInterval(updateStatistic, 700);
+			//createTimeline()
+			//setInterval(updateChart, 500);
+			//setInterval(updateStatistic, 700);
 			}
 			function onJsonTest() {
-			$.ajax({
-			   		url: "/webtop",
-			   		type: "POST",
-			   		data: '{\"Type\": \"2\"}',
-			   		dataType: "json"
-			})
+
 			}
 			
 		</script>
@@ -177,25 +194,34 @@
 			</div>
 			<div class="panel-footer">Process list
 			</div>
-			<table class="table">
+			<table class="table table-bordered table-condensed table-hover table-striped">
 				<thead>
 					<tr>
 						<th>pid</th>
-						<th>First Name</th>
+						<th>name</th>
+						<th>user id</th>
+						<th>cpu %</th>
+						<th>memory %</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>1</td>
-						<td>Michael</td>
+						<td>test          </td>
+						<td>100</td>
+						<td>50</td>
+						<td>2</td>
 					</tr>
 					<tr>
+						<td>1</td>
+						<td>test2</td>
+						<td>100</td>
+						<td>50</td>
 						<td>2</td>
-						<td>Jake</td>
 					</tr>
 				</tbody>
 			</table>
-			<a class="btn btn-primary" onclick="onJsonTest()">Test Top</a>
+			<a class="btn btn-primary" onclick="updateTop()">Test Top</a>
 			<div class="panel-body" data-ds-editmark="true"></div>
 		</div>
 	</body>
