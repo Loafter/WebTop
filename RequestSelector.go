@@ -28,8 +28,9 @@ func (requestSelector *RequestSelector) Init() error {
 	systemMonitorDispatcher.StartMesure()
 	requestSelector.selectorRequestMap[SystemMonitor] = systemMonitorDispatcher
 	//same dispatcher for two message
-	TopProcessDisp := new(SystemMonitorDispatcher)
-	requestSelector.selectorRequestMap[TopProcess] = TopProcessDisp
-	requestSelector.selectorRequestMap[KillProcess] = TopProcessDisp
+	topProcessDispatcher := new(TopDispatcher)
+	topProcessDispatcher.StartMesure()
+	requestSelector.selectorRequestMap[TopProcess] = topProcessDispatcher
+	requestSelector.selectorRequestMap[KillProcess] = topProcessDispatcher
 	return nil
 }

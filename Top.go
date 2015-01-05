@@ -42,10 +42,11 @@ func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	}
 	statFileStr := string(statFileData)
 	cpuTimeReg := regexp.MustCompile("\\d+")
-	utime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[11])
-	stime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[12])
-	cutime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[13])
-	cstime, _ := strconv.Atoi(cpuTimeReg.FindAllString(statFileStr, -1)[14])
+	cpuStatField := cpuTimeReg.FindAllString(statFileStr, -1)
+	utime, _ := strconv.Atoi(cpuStatField[11])
+	stime, _ := strconv.Atoi(cpuStatField[12])
+	cutime, _ := strconv.Atoi(cpuStatField[13])
+	cstime, _ := strconv.Atoi(cpuStatField[14])
 	sumTime := int64(utime + stime + cutime + cstime)
 	return sumTime, nil
 }
@@ -70,7 +71,7 @@ func (top *Top) collectInfo() error {
 			return errors.New("error: problem with read proc filesystem")
 		}
 		StartTicks, sumOldTick := top.getTicksMap(pids)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 		pids, _ = top.getAllPids()
 		EndTicks, sumNewTick := top.getTicksMap(pids)
 		top.accessMutes.Lock()

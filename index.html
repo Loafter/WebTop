@@ -134,7 +134,16 @@
 			createTimeline()
 			setInterval(updateChart, 500);
 			setInterval(updateStatistic, 700);
-			 	}
+			}
+			function onJsonTest() {
+			$.ajax({
+			   		url: "/webtop",
+			   		type: "POST",
+			   		data: '{\"Type\": \"2\"}',
+			   		dataType: "json"
+			})
+			}
+			
 		</script>
 	</head>
 	<body onload="onDocumentLoad()">
@@ -186,6 +195,7 @@
 					</tr>
 				</tbody>
 			</table>
+			<a class="btn btn-primary" onclick="onJsonTest()">Test Top</a>
 			<div class="panel-body" data-ds-editmark="true"></div>
 		</div>
 	</body>
