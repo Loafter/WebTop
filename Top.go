@@ -124,7 +124,9 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 			} else {
 				processItem.Cpu = 0
 			}
+			//if processItem.Cpu != 0 {
 			processItems = append(processItems, processItem)
+			//}
 		}
 	}
 	return processItems
