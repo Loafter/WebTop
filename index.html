@@ -180,8 +180,20 @@
 			$("#process-list-table").append(inerHtml)
 
 		}
+		 function updateProcessInTable(processInfo){
+			pid=processInfo.Pid
+			Name=processInfo.Name
+			User=processInfo.User
+			Cpu=processInfo.Cpu.toFixed(1)
+			Memory=processInfo.Memory.toFixed(1)
+			$("#pid"+pid).text(pid)
+			$("#name-id"+pid).text(Name)
+			$("#user-id"+pid).text(User)
+			$("#cpu-id"+pid).text(Cpu)
+			$("#memory-id"+pid).text(Memory)
+		}
 		function deleteProcessFromTable(pid){
-			rowId="pr-items"+pid
+			rowId="#pr-items"+pid
 			$(rowId).remove()
 		}
         function updateTop() {
@@ -209,6 +221,7 @@
                         pid = topDic[index].Pid
                         if (!(lastTopData[pid] === undefined)) {
                             console.log("updated "+JSON.stringify(topDic[index].Pid))
+							updateProcessInTable(topDic[index])
                         } else {
                             console.log("added "+JSON.stringify(topDic[index].Pid))
 						   addProcessToTable(topDic[index])
@@ -226,9 +239,10 @@
         }
 
         function onDocumentLoad() {
-            //createTimeline()
-            //setInterval(updateChart, 500);
-            //setInterval(updateStatistic, 700);
+            createTimeline()
+            setInterval(updateChart, 500);
+            setInterval(updateStatistic, 700);
+			setInterval(updateTop, 700)
         }
     </script>
 </head>
@@ -268,7 +282,7 @@
                 </div>
                 <div class="col-md-4">
                     <span class="label label-default">Cpu graph</span>
-                    <canvas id="cpu-mem-chart" width="218" height="138"></canvas>
+                   <span class="tab"> <canvas id="cpu-mem-chart" width="218" height="138"></canvas></span>
                 </div>
             </div>
         </div>
@@ -287,7 +301,6 @@
             <tbody id="process-list-table">
             </tbody>
         </table>
-        <a class="btn btn-primary" onclick="updateTop()">Test Top</a>
         <div class="panel-body" data-ds-editmark="true"></div>
     </div>
 </body>
