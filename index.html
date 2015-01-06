@@ -169,7 +169,21 @@
                 $("#cached-mem").text((jsonData.MemSample.Cached * 0.000976562).toFixed(1) + ' Mb')
             })
         }
+	    function addProcessToTable(processInfo){
+			pid=processInfo.Pid
+			Name=processInfo.Name
+			User=processInfo.User
+			Cpu=processInfo.Cpu.toFixed(1)
+			Memory=processInfo.Memory.toFixed(1)
+			inerHtml=""
+			inerHtml=inerHtml.concat('<tr id="pr-items'+pid+'"><td id="pid'+pid+'">'+pid+'</td><td id="name-id'+pid+'">'+Name+'</td><td id="user-id'+pid+'">'+User+'</td><td id="cpu-id'+pid+'">'+Cpu+'</td><td id="memory-id'+pid+'">'+Memory+'</td></tr>')
+			$("#process-list-table").append(inerHtml)
 
+		}
+		function deleteProcessFromTable(pid){
+			rowId="pr-items"+pid
+			$(rowId).remove()
+		}
         function updateTop() {
             $.ajax({
                 url: "/webtop",
@@ -186,6 +200,9 @@
                 if (Object.keys(lastTopData).length == 0) {
                     lastTopData = topDic
                     console.log("full new table")
+					for (index in topDic) {
+					addProcessToTable(topDic[index])
+					}
                 } else {
                     itemsforRemove = lastTopData
                     for (index in topDic) {
@@ -194,11 +211,13 @@
                             console.log("updated "+JSON.stringify(topDic[index].Pid))
                         } else {
                             console.log("added "+JSON.stringify(topDic[index].Pid))
+						   addProcessToTable(topDic[index])
                         }
                     }
                     for (index in itemsforRemove) {
                         if ((topDic[index] === undefined)) {
                             console.log("deleted "+JSON.stringify(itemsforRemove[index].Pid))
+						   deleteProcessFromTable(itemsforRemove[index].Pid)
                         }
                     }
                 }
@@ -262,17 +281,10 @@
                     <th>name</th>
                     <th>user id</th>
                     <th>cpu %</th>
-                    <th>memory %</th>
+                    <th>memory Kb.</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>test </td>
-                    <td>100</td>
-                    <td>50</td>
-                    <td>2</td>
-                </tr>
+            <tbody id="process-list-table">
             </tbody>
         </table>
         <a class="btn btn-primary" onclick="updateTop()">Test Top</a>
