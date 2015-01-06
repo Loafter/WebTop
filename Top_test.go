@@ -44,3 +44,19 @@ func TestTopCpu(t *testing.T) {
 	}
 
 }
+func TestTopTicks(t *testing.T) {
+	top := new(Top)
+	top.StartCollectInfo()
+	for i := 0; i < 5; i++ {
+		Ticks, err := top.getTicksProcessor()
+		time.Sleep(500 * time.Millisecond)
+		if err != nil {
+			t.Errorf("")
+			return
+		} else {
+			fmt.Printf("Ticks: %v \n", Ticks)
+			fmt.Println("_______________________________________________________________________________________________________________________________________________________________________")
+		}
+	}
+
+}

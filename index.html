@@ -99,6 +99,7 @@
     </style>
     <script type="text/javascript">
         var lastTopData = {};
+	    var minCpuUsage=0 
         var cpuData = new TimeSeries();
         var memData = new TimeSeries();
 
@@ -169,33 +170,37 @@
                 $("#cached-mem").text((jsonData.MemSample.Cached * 0.000976562).toFixed(1) + ' Mb')
             })
         }
-	    function addProcessToTable(processInfo){
-			pid=processInfo.Pid
-			Name=processInfo.Name
-			User=processInfo.User
-			Cpu=processInfo.Cpu.toFixed(1)
-			Memory=processInfo.Memory.toFixed(1)
-			inerHtml=""
-			inerHtml=inerHtml.concat('<tr id="pr-items'+pid+'"><td id="pid'+pid+'">'+pid+'</td><td id="name-id'+pid+'">'+Name+'</td><td id="user-id'+pid+'">'+User+'</td><td id="cpu-id'+pid+'">'+Cpu+'</td><td id="memory-id'+pid+'">'+Memory+'</td></tr>')
-			$("#process-list-table").append(inerHtml)
 
-		}
-		 function updateProcessInTable(processInfo){
-			pid=processInfo.Pid
-			Name=processInfo.Name
-			User=processInfo.User
-			Cpu=processInfo.Cpu.toFixed(1)
-			Memory=processInfo.Memory.toFixed(1)
-			$("#pid"+pid).text(pid)
-			$("#name-id"+pid).text(Name)
-			$("#user-id"+pid).text(User)
-			$("#cpu-id"+pid).text(Cpu)
-			$("#memory-id"+pid).text(Memory)
-		}
-		function deleteProcessFromTable(pid){
-			rowId="#pr-items"+pid
-			$(rowId).remove()
-		}
+        function addProcessToTable(processInfo) {
+            pid = processInfo.Pid
+            Name = processInfo.Name
+            User = processInfo.User
+            Cpu = processInfo.Cpu.toFixed(1)
+            Memory = processInfo.Memory.toFixed(1)
+            inerHtml = ""
+            inerHtml = inerHtml.concat('<tr id="pr-items' + pid + '"><td id="pid' + pid + '">' + pid + '</td><td id="name-id' + pid + '">' + Name + '</td><td id="user-id' + pid + '">' + User + '</td><td id="cpu-id' + pid + '">' + Cpu + '</td><td id="memory-id' + pid + '">' + Memory + '</td></tr>')
+            $("#process-list-table").append(inerHtml)
+
+        }
+
+        function updateProcessInTable(processInfo) {
+            pid = processInfo.Pid
+            Name = processInfo.Name
+            User = processInfo.User
+            Cpu = (processInfo.Cpu*100).toFixed(1)
+            Memory = processInfo.Memory.toFixed(1)
+            $("#pid" + pid).text(pid)
+            $("#name-id" + pid).text(Name)
+            $("#user-id" + pid).text(User)
+            $("#cpu-id" + pid).text(Cpu)
+            $("#memory-id" + pid).text(Memory)
+        }
+
+        function deleteProcessFromTable(pid) {
+            rowId = "#pr-items" + pid
+            $(rowId).remove()
+        }
+
         function updateTop() {
             $.ajax({
                 url: "/webtop",
@@ -206,31 +211,33 @@
                 var topDic = {};
                 for (index in jsonData.ProcessItems) {
                     topItems = jsonData.ProcessItems[index]
-                    topDic[topItems.Pid] = topItems;
+					if(minCpuUsage<=topItems.Cpu){
+                     	topDic[topItems.Pid] = topItems;
+					}
                 }
-				console.log("_______________________________________________________________________________________________________________________________________________________________________________________________")
+                console.log("_______________________________________________________________________________________________________________________________________________________________________________________________")
                 if (Object.keys(lastTopData).length == 0) {
                     lastTopData = topDic
                     console.log("full new table")
-					for (index in topDic) {
-					addProcessToTable(topDic[index])
-					}
+                    for (index in topDic) {
+                        addProcessToTable(topDic[index])
+                    }
                 } else {
                     itemsforRemove = lastTopData
                     for (index in topDic) {
                         pid = topDic[index].Pid
                         if (!(lastTopData[pid] === undefined)) {
-                            console.log("updated "+JSON.stringify(topDic[index].Pid))
-							updateProcessInTable(topDic[index])
+                            console.log("updated " + JSON.stringify(topDic[index].Pid))
+                            updateProcessInTable(topDic[index])
                         } else {
-                            console.log("added "+JSON.stringify(topDic[index].Pid))
-						   addProcessToTable(topDic[index])
+                            console.log("added " + JSON.stringify(topDic[index].Pid))
+                            addProcessToTable(topDic[index])
                         }
                     }
                     for (index in itemsforRemove) {
                         if ((topDic[index] === undefined)) {
-                            console.log("deleted "+JSON.stringify(itemsforRemove[index].Pid))
-						   deleteProcessFromTable(itemsforRemove[index].Pid)
+                            console.log("deleted " + JSON.stringify(itemsforRemove[index].Pid))
+                            deleteProcessFromTable(itemsforRemove[index].Pid)
                         }
                     }
                 }
@@ -242,8 +249,31 @@
             createTimeline()
             setInterval(updateChart, 500);
             setInterval(updateStatistic, 700);
-			setInterval(updateTop, 700)
+            setInterval(updateTop, 700)
         }
+		function switchUsage() {
+		if(minCpuUsage==0.0){
+			minCpuUsage=0.000001
+			$("#cpu-minum").text(">0")
+		}
+		else if(minCpuUsage==0.000001){
+			minCpuUsage=0.25
+			$("#cpu-minum").text(">25")
+		}
+		else if(minCpuUsage==0.25){
+			minCpuUsage=0.5
+			$("#cpu-minum").text(">50")
+		}
+		else if(minCpuUsage==0.5){
+			minCpuUsage=0.75
+			$("#cpu-minum").text(">75")
+		}
+		else if(minCpuUsage==0.75){
+			minCpuUsage=0
+			 $("#cpu-minum").text(">=0")	
+		}
+		}
+		
     </script>
 </head>
 
@@ -282,7 +312,7 @@
                 </div>
                 <div class="col-md-4">
                     <span class="label label-default">Cpu graph</span>
-                   <span class="tab"> <canvas id="cpu-mem-chart" width="218" height="138"></canvas></span>
+                    <span class="tab"> <canvas id="cpu-mem-chart" width="218" height="138"></canvas></span>
                 </div>
             </div>
         </div>
@@ -291,11 +321,11 @@
         <table class="table table-bordered table-condensed table-hover table-striped">
             <thead>
                 <tr>
-                    <th>pid</th>
-                    <th>name</th>
-                    <th>user id</th>
-                    <th>cpu %</th>
-                    <th>memory Kb.</th>
+           		 	<th>Pid</th>
+            			<th>Process name</th>
+            			<th>User id</th>
+            			<th>Cpu <span onclick="switchUsage()" id="cpu-minum">>=0</span>%</th>
+            			<th>Mem Kb.</th>
                 </tr>
             </thead>
             <tbody id="process-list-table">

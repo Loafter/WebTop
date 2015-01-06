@@ -51,8 +51,23 @@ func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	return sumTime, nil
 }
 
-func (top *Top) getTicksMap(pids []int) (map[int]int64, int64) {
-	var sum int64
+func (top *Top) getTicksProcessor() (int64, error) {
+	statFileData, err := ioutil.ReadFile("/proc/stat")
+	if err != nil {
+		return 0, errors.New("error: problem with read proc filesystem \n " + err.Error())
+	}
+	statFileStr := string(statFileData)
+	cpuTimeReg := regexp.MustCompile("\\d+")
+	cpuStatField := cpuTimeReg.FindAllString(statFileStr, -1)[:9]
+	var sumTime int64
+	for _, cpuField := range cpuStatField {
+		tim, _ := strconv.Atoi(cpuField)
+		sumTime += int64(tim)
+	}
+	return sumTime, nil
+}
+
+func (top *Top) getTicksMap(pids []int) map[int]int64 {
 	ticksMap := make(map[int]int64)
 	for _, element := range pids {
 		ticks, err := top.getTicksbyPid(element)
@@ -60,9 +75,8 @@ func (top *Top) getTicksMap(pids []int) (map[int]int64, int64) {
 			ticksMap[element] = 0
 		}
 		ticksMap[element] = ticks
-		sum += ticks
 	}
-	return ticksMap, sum
+	return ticksMap
 }
 func (top *Top) collectInfo() error {
 	for {
@@ -70,10 +84,12 @@ func (top *Top) collectInfo() error {
 		if err != nil {
 			return errors.New("error: problem with read proc filesystem \n " + err.Error())
 		}
-		StartTicks, sumOldTick := top.getTicksMap(pids)
+		StartTicks := top.getTicksMap(pids)
+		sumOldTick, _ := top.getTicksProcessor()
 		time.Sleep(1000 * time.Millisecond)
 		pids, _ = top.getAllPids()
-		EndTicks, sumNewTick := top.getTicksMap(pids)
+		EndTicks := top.getTicksMap(pids)
+		sumNewTick, _ := top.getTicksProcessor()
 		top.accessMutes.Lock()
 		top.processItems = top.fillProcessInfo(StartTicks, EndTicks, sumNewTick-sumOldTick)
 		top.accessMutes.Unlock()
@@ -124,9 +140,9 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 			} else {
 				processItem.Cpu = 0
 			}
-			if processItem.Cpu != 0 {
-				processItems = append(processItems, processItem)
-			}
+			//if processItem.Cpu != 0 {
+			processItems = append(processItems, processItem)
+			//}
 		}
 	}
 	return processItems
