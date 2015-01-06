@@ -47,7 +47,7 @@ func (service *TopJsonService) ServePage(responseWriter http.ResponseWriter, req
 
 func (service *TopJsonService) ReturnDummyReq(responseWriter http.ResponseWriter, request *http.Request) {
 	//this is service is not need lock
-	serviceState := ServiceStateRequest{BasicRequest{1}}
+	serviceState := KillRequest{BasicRequest{6}, 87}
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)

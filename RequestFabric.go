@@ -40,9 +40,17 @@ func (fabric *JsonFabric) ProduceJsonRequest(request *http.Request) (Request, er
 		var topRequest TopRequest
 		err := json.Unmarshal(bodyData, &topRequest)
 		if err != nil {
-			return nil, errors.New("error: Can't parse system state request \n " + err.Error())
+			return nil, errors.New("error: Can't parse top request \n " + err.Error())
 		}
 		return topRequest, nil
+	case KillProcess:
+		var killRequest KillRequest
+		err := json.Unmarshal(bodyData, &killRequest)
+		if err != nil {
+			return nil, errors.New("error: Can't parse top request \n " + err.Error())
+		}
+		return killRequest, nil
+
 	}
 
 	return nil, errors.New("error: Unknown request type")

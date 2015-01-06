@@ -1,6 +1,5 @@
 package main
 
-//import "fmt"
 import "errors"
 import "net/http"
 

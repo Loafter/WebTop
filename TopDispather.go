@@ -8,6 +8,14 @@ type TopResponse struct {
 	ProcessItems []ProcessItem
 }
 
+type KillResponse struct {
+	KilResult string
+}
+
+type KillRequest struct {
+	BasicRequest
+	Pid int `Pid:"Type,string,omitempty"`
+}
 type TopRequest struct {
 	BasicRequest
 }
@@ -32,7 +40,22 @@ func (serviceStateDispatcher *TopDispatcher) Dispatch(request Request, responseW
 		responseWriter.Header().Set("Content-Type", "application/json")
 		responseWriter.Write(tr)
 	case KillProcess:
-		return nil
+		killRequest := request.(KillRequest)
+		err := serviceStateDispatcher.top.KillProcess(killRequest.Pid)
+		var killResultMsg string
+		if err != nil {
+			killResultMsg = err.Error()
+		} else {
+			killResultMsg = "Send kill top process" + string(killRequest.Pid)
+		}
+		killResponseResponse := KillResponse{KilResult: killResultMsg}
+		tr, err := json.Marshal(killResponseResponse)
+		if err != nil {
+			http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+			return err
+		}
+		responseWriter.Header().Set("Content-Type", "application/json")
+		responseWriter.Write(tr)
 	}
 	return nil
 }

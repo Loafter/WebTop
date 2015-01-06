@@ -6,6 +6,7 @@ import "regexp"
 import "errors"
 import "time"
 import "sync"
+import "os"
 
 //process info sructure
 type ProcessItem struct {
@@ -22,8 +23,9 @@ type Timeval struct {
 }
 
 type Top struct {
-	processItems []ProcessItem
-	accessMutes  sync.Mutex
+	processItems    []ProcessItem
+	accessTopMutes  sync.Mutex
+	accessKillMutes sync.Mutex
 }
 
 func (top *Top) StartCollectInfo() error {
@@ -90,11 +92,11 @@ func (top *Top) collectInfo() error {
 		pids, _ = top.getAllPids()
 		EndTicks := top.getTicksMap(pids)
 		sumNewTick, _ := top.getTicksProcessor()
-		top.accessMutes.Lock()
+		top.accessTopMutes.Lock()
 		top.processItems = top.fillProcessInfo(StartTicks, EndTicks, sumNewTick-sumOldTick)
-		top.accessMutes.Unlock()
+		top.accessTopMutes.Unlock()
 	}
-	defer top.accessMutes.Unlock()
+	defer top.accessTopMutes.Unlock()
 	return nil
 }
 
@@ -150,12 +152,21 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 
 //
 func (top *Top) GetProcessList() ([]ProcessItem, error) {
-	top.accessMutes.Lock()
-	defer top.accessMutes.Unlock()
+	top.accessTopMutes.Lock()
+	defer top.accessTopMutes.Unlock()
 	return top.processItems, nil
 }
 
 func (top *Top) KillProcess(pid int) error {
-	//this is service is need lock
+	top.accessKillMutes.Lock()
+	defer top.accessKillMutes.Unlock()
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return errors.New("error: can't find process \n " + string(pid) + err.Error())
+	}
+	err = process.Kill()
+	if err != nil {
+		return errors.New("error: can't kill process \n " + string(pid) + err.Error())
+	}
 	return nil
 }
