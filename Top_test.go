@@ -60,3 +60,27 @@ func TestTopTicks(t *testing.T) {
 	}
 
 }
+
+func ThreadTest() {
+	fmt.Println("Do some job")
+	time.Sleep(1000 * time.Millisecond)
+}
+func TestBatchJob(t *testing.T) {
+	batchJob := BatchJob{}
+	err := batchJob.Start()
+	if err == nil {
+		t.Errorf("error: Test start not inited job failed ")
+	}
+
+	err = batchJob.Stop()
+	if err == nil {
+		t.Errorf("error: Test stop not inited job failed ")
+	}
+	batchJob.Job = ThreadTest
+	batchJob.Start()
+	time.Sleep(500 * time.Millisecond)
+	err = batchJob.Stop()
+	if err != nil {
+		t.Errorf("error: Test stop failed ")
+	}
+}
