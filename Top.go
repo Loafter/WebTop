@@ -5,7 +5,6 @@ import "strconv"
 import "regexp"
 import "errors"
 import "time"
-import "sync"
 import "os"
 import "fmt"
 
@@ -25,14 +24,13 @@ type Timeval struct {
 
 type Top struct {
 	processItems    []ProcessItem
-	accessTopMutes  sync.Mutex
-	accessKillMutes sync.Mutex
 	collectInfoJob  BatchJob
 	lastRequestTime time.Time
 }
 
 func (top *Top) StartCollectInfo() error {
 	top.collectInfoJob.Job = top.collectInfo
+	top.lastRequestTime = time.Now()
 	err := top.collectInfoJob.Start()
 	if err != nil {
 		return errors.New("error: Can't start collect info job\n" + err.Error())
@@ -90,6 +88,7 @@ func (top *Top) getTicksMap(pids []int) map[int]int64 {
 	}
 	return ticksMap
 }
+
 func (top *Top) collectInfo() {
 	for {
 		pids, err := top.getAllPids()
@@ -103,15 +102,13 @@ func (top *Top) collectInfo() {
 		EndTicks := top.getTicksMap(pids)
 		sumNewTick, _ := top.getTicksProcessor()
 
-		top.accessTopMutes.Lock()
 		top.processItems = top.fillProcessInfo(StartTicks, EndTicks, sumNewTick-sumOldTick)
 		secondLastRequest := time.Now().Sub(top.lastRequestTime)
-		fmt.Printf("Delta request %v second\n req time %v ", secondLastRequest.Seconds(), top.lastRequestTime)
+		fmt.Printf("Delta request collectInfo %v second\n", secondLastRequest.Seconds())
 		if secondLastRequest.Seconds() > 5 {
 			fmt.Println("sleep collect info job")
 			top.collectInfoJob.Stop()
 		}
-		top.accessTopMutes.Unlock()
 	}
 	return
 }
@@ -166,19 +163,15 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 
 //
 func (top *Top) GetProcessList() ([]ProcessItem, error) {
-	top.accessTopMutes.Lock()
 	if !top.collectInfoJob.IsRunning() {
 		fmt.Println("Start collect info job")
 		top.collectInfoJob.Start()
 	}
-	defer top.accessTopMutes.Unlock()
 	top.lastRequestTime = time.Now()
 	return top.processItems, nil
 }
 
 func (top *Top) KillProcess(pid int) error {
-	top.accessKillMutes.Lock()
-	defer top.accessKillMutes.Unlock()
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		return errors.New("error: can't find process \n" + string(pid) + err.Error())

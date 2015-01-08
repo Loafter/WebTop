@@ -3,9 +3,9 @@ package main
 import "net/http"
 import "encoding/json"
 
-import "sync"
 import "time"
 import "errors"
+import "fmt"
 
 type SystemStateRequest struct {
 	BasicRequest
@@ -17,7 +17,6 @@ type SystemMonitorResponse struct {
 }
 
 type SystemMonitorDispatcher struct {
-	accessMutes     sync.Mutex
 	lastCPUSample   CPUSample
 	lastCPUAverage  CPUAverage
 	mesureJob       BatchJob
@@ -25,8 +24,6 @@ type SystemMonitorDispatcher struct {
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) getCPUUsage() CPUAverage {
-	serviceStateDispatcher.accessMutes.Lock()
-	defer serviceStateDispatcher.accessMutes.Unlock()
 	lastCPUAverage := serviceStateDispatcher.lastCPUAverage
 	return lastCPUAverage
 
@@ -34,21 +31,22 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) getCPUUsage() CPUAverage 
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) mesureCPU() {
 	for {
-		serviceStateDispatcher.accessMutes.Lock()
 		serviceStateDispatcher.lastCPUAverage = GetCPUAverage(serviceStateDispatcher.lastCPUSample, GetCPUSample())
 		serviceStateDispatcher.lastCPUSample = GetCPUSample()
-		serviceStateDispatcher.accessMutes.Unlock()
 		time.Sleep(500 * time.Millisecond)
 		secondLastRequest := time.Now().Sub(serviceStateDispatcher.lastRequestTime)
+		fmt.Printf("Delta request  SystemMonitorDispatcher %v second\n", secondLastRequest.Seconds())
 		if secondLastRequest.Seconds() > 5 {
+			fmt.Println("sleep mesureCPU job")
 			serviceStateDispatcher.mesureJob.Stop()
+
 		}
 	}
-	defer serviceStateDispatcher.accessMutes.Unlock()
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) StartMesure() error {
 	serviceStateDispatcher.mesureJob.Job = serviceStateDispatcher.mesureCPU
+	serviceStateDispatcher.lastRequestTime = time.Now()
 	err := serviceStateDispatcher.mesureJob.Start()
 	if err != nil {
 		return errors.New("error: Can't start mesure job\n" + err.Error())
@@ -77,8 +75,6 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request,
 	}
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Write(js)
-	serviceStateDispatcher.accessMutes.Lock()
-	defer serviceStateDispatcher.accessMutes.Unlock()
 	serviceStateDispatcher.lastRequestTime = time.Now()
 	return nil
 }
