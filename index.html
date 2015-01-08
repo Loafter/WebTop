@@ -176,9 +176,9 @@
             Name = processInfo.Name
             User = processInfo.User
             Cpu = processInfo.Cpu.toFixed(1)
-            Memory = processInfo.Memory.toFixed(1)
+            Mem = (processInfo.Memory).toFixed(1)
             inerHtml = ""
-            inerHtml = inerHtml.concat('<tr onclick="onClickKill(this)" id="pr-items' + pid + '"><td id="pid' + pid + '">' + pid + '</td><td id="name-id' + pid + '">' + Name + '</td><td id="user-id' + pid + '">' + User + '</td><td id="cpu-id' + pid + '">' + Cpu + '</td><td id="memory-id' + pid + '">' + Memory + '</td></tr>')
+            inerHtml = inerHtml.concat('<tr onclick="onClickKill(this)" id="pr-items' + pid + '"><td id="pid' + pid + '">' + pid + '</td><td id="name-id' + pid + '">' + Name + '</td><td id="user-id' + pid + '">' + User + '</td><td id="cpu-id' + pid + '">' + Cpu + '</td><td id="memory-id' + pid + '">' + Mem + '</td></tr>')
             $("#process-list-table").append(inerHtml)
 
         }
@@ -335,7 +335,7 @@
             			<th>Process name</th>
             			<th>User id</th>
             			<th>Cpu <span onclick="switchUsage()" id="cpu-minum">>=0</span>%</th>
-            			<th>Mem Kb.</th>
+            			<th>Mem Mb.</th>
                 </tr>
             </thead>
             <tbody id="process-list-table">

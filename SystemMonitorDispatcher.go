@@ -35,7 +35,7 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) mesureCPU() {
 		serviceStateDispatcher.lastCPUSample = GetCPUSample()
 		time.Sleep(500 * time.Millisecond)
 		secondLastRequest := time.Now().Sub(serviceStateDispatcher.lastRequestTime)
-		fmt.Printf("Delta request  SystemMonitorDispatcher %v second\n", secondLastRequest.Seconds())
+		fmt.Printf("Delta request collectInfo %v second\n", secondLastRequest.Seconds())
 		if secondLastRequest.Seconds() > 5 {
 			fmt.Println("sleep mesureCPU job")
 			serviceStateDispatcher.mesureJob.Stop()
@@ -62,7 +62,6 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) StopMesure() error {
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
-	//this is service need lock
 	if !serviceStateDispatcher.mesureJob.runJob {
 		serviceStateDispatcher.mesureJob.Start()
 	}
