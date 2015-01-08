@@ -4,7 +4,7 @@ import "testing"
 import "time"
 import "fmt"
 
-func TestTopList(t *testing.T) {
+/*func TestTopList(t *testing.T) {
 	top := new(Top)
 	top.StartCollectInfo()
 	for i := 0; i < 10; i++ {
@@ -59,12 +59,29 @@ func TestTopTicks(t *testing.T) {
 		}
 	}
 
-}
+}*/
 
 func ThreadTest() {
 	fmt.Println("Do some job")
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 }
+
+func StopThreadTest(batchJob *BatchJob) {
+	for i := 0; i < 50; i++ {
+		//fmt.Println("Try stop")
+		batchJob.Stop()
+		time.Sleep(120 * time.Millisecond)
+	}
+}
+
+func StartThreadTest(batchJob *BatchJob) {
+	for i := 0; i < 50; i++ {
+		//fmt.Println("Try start")
+		batchJob.Start()
+		time.Sleep(90 * time.Millisecond)
+	}
+}
+
 func TestBatchJob(t *testing.T) {
 	batchJob := BatchJob{}
 	err := batchJob.Start()
@@ -83,4 +100,12 @@ func TestBatchJob(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: Test stop failed ")
 	}
+	go StartThreadTest(&batchJob)
+	go StopThreadTest(&batchJob)
+	time.Sleep(500 * time.Millisecond)
+	for i := 0; i < 100; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(batchJob.IsRunning())
+	}
+	time.Sleep(10000 * time.Millisecond)
 }

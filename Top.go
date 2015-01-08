@@ -7,6 +7,7 @@ import "errors"
 import "time"
 import "sync"
 import "os"
+import "fmt"
 
 //process info sructure
 type ProcessItem struct {
@@ -26,21 +27,30 @@ type Top struct {
 	processItems    []ProcessItem
 	accessTopMutes  sync.Mutex
 	accessKillMutes sync.Mutex
+	collectInfoJob  BatchJob
+	lastRequestTime time.Time
 }
 
 func (top *Top) StartCollectInfo() error {
-	top.processItems = []ProcessItem{}
-	go top.collectInfo()
+	top.collectInfoJob.Job = top.collectInfo
+	err := top.collectInfoJob.Start()
+	if err != nil {
+		return errors.New("error: Can't start collect info job\n" + err.Error())
+	}
 	return nil
 }
 func (top *Top) StopCollectInfo() error {
+	err := top.collectInfoJob.Stop()
+	if err != nil {
+		return errors.New("error: Can't stop  collect info job\n" + err.Error())
+	}
 	return nil
 }
 
 func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
 	if err != nil {
-		return 0, errors.New("error: problem with read proc filesystem \n " + err.Error())
+		return 0, errors.New("error: problem with read proc filesystem \n" + err.Error())
 	}
 	statFileStr := string(statFileData)
 	cpuTimeReg := regexp.MustCompile("\\d+")
@@ -56,7 +66,7 @@ func (top *Top) getTicksbyPid(pid int) (int64, error) {
 func (top *Top) getTicksProcessor() (int64, error) {
 	statFileData, err := ioutil.ReadFile("/proc/stat")
 	if err != nil {
-		return 0, errors.New("error: problem with read proc filesystem \n " + err.Error())
+		return 0, errors.New("error: problem with read proc filesystem \n" + err.Error())
 	}
 	statFileStr := string(statFileData)
 	cpuTimeReg := regexp.MustCompile("\\d+")
@@ -80,11 +90,11 @@ func (top *Top) getTicksMap(pids []int) map[int]int64 {
 	}
 	return ticksMap
 }
-func (top *Top) collectInfo() error {
+func (top *Top) collectInfo() {
 	for {
 		pids, err := top.getAllPids()
 		if err != nil {
-			return errors.New("error: problem with read proc filesystem \n " + err.Error())
+			return //errors.New("error: problem with read proc filesystem \n" + err.Error())
 		}
 		StartTicks := top.getTicksMap(pids)
 		sumOldTick, _ := top.getTicksProcessor()
@@ -92,12 +102,18 @@ func (top *Top) collectInfo() error {
 		pids, _ = top.getAllPids()
 		EndTicks := top.getTicksMap(pids)
 		sumNewTick, _ := top.getTicksProcessor()
+
 		top.accessTopMutes.Lock()
 		top.processItems = top.fillProcessInfo(StartTicks, EndTicks, sumNewTick-sumOldTick)
+		secondLastRequest := time.Now().Sub(top.lastRequestTime)
+		fmt.Printf("Delta request %v second\n req time %v ", secondLastRequest.Seconds(), top.lastRequestTime)
+		if secondLastRequest.Seconds() > 5 {
+			fmt.Println("sleep collect info job")
+			top.collectInfoJob.Stop()
+		}
 		top.accessTopMutes.Unlock()
 	}
-	defer top.accessTopMutes.Unlock()
-	return nil
+	return
 }
 
 //
@@ -142,9 +158,7 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 			} else {
 				processItem.Cpu = 0
 			}
-			//if processItem.Cpu != 0 {
 			processItems = append(processItems, processItem)
-			//}
 		}
 	}
 	return processItems
@@ -153,7 +167,12 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 //
 func (top *Top) GetProcessList() ([]ProcessItem, error) {
 	top.accessTopMutes.Lock()
+	if !top.collectInfoJob.IsRunning() {
+		fmt.Println("Start collect info job")
+		top.collectInfoJob.Start()
+	}
 	defer top.accessTopMutes.Unlock()
+	top.lastRequestTime = time.Now()
 	return top.processItems, nil
 }
 
@@ -162,11 +181,11 @@ func (top *Top) KillProcess(pid int) error {
 	defer top.accessKillMutes.Unlock()
 	process, err := os.FindProcess(pid)
 	if err != nil {
-		return errors.New("error: can't find process \n " + string(pid) + err.Error())
+		return errors.New("error: can't find process \n" + string(pid) + err.Error())
 	}
 	err = process.Kill()
 	if err != nil {
-		return errors.New("error: can't kill process \n " + string(pid) + err.Error())
+		return errors.New("error: can't kill process \n" + string(pid) + err.Error())
 	}
 	return nil
 }

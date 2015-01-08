@@ -39,7 +39,7 @@ func (service *TopJsonService) ServePage(responseWriter http.ResponseWriter, req
 	responseWriter.Header().Set("Content-Type: text/html", "*")
 	content, err := ioutil.ReadFile("index.html")
 	if err != nil {
-		responseWriter.Write([]byte("error: Can't find start page \n " + err.Error()))
+		responseWriter.Write([]byte("error: Can't find start page \n" + err.Error()))
 		return
 	}
 	responseWriter.Write(content)
