@@ -52,7 +52,7 @@ func (top *Top) StopCollectInfo() error {
 func (top *Top) getTicksbyPid(pid int) (int64, error) {
 	statFileData, err := ioutil.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
 	if err != nil {
-		stErr := "error: problem with read proc filesystem"
+		stErr := "info: problem with read stat file with pid " + strconv.Itoa(pid)
 		log.Println(stErr)
 		return 0, errors.New(stErr)
 	}
@@ -162,7 +162,7 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 				processItem.Cpu = float32(float64(newTickVal-oldTickVal) / float64(sumTicks))
 
 			} else {
-				stErr := "info: can't messure cpu info for process "
+				stErr := "info: can't messure cpu info for process"
 				log.Println(stErr, processItem.Name)
 				processItem.Cpu = 0
 			}
