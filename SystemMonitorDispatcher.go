@@ -5,7 +5,7 @@ import "encoding/json"
 
 import "time"
 import "errors"
-import "fmt"
+import "log"
 
 type SystemStateRequest struct {
 	BasicRequest
@@ -35,9 +35,9 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) mesureCPU() {
 		serviceStateDispatcher.lastCPUSample = GetCPUSample()
 		time.Sleep(500 * time.Millisecond)
 		secondLastRequest := time.Now().Sub(serviceStateDispatcher.lastRequestTime)
-		fmt.Printf("Delta request collectInfo %v second\n", secondLastRequest.Seconds())
 		if secondLastRequest.Seconds() > 5 {
-			fmt.Println("sleep mesureCPU job")
+
+			log.Println("info: sleep mesure cpu job")
 			serviceStateDispatcher.mesureJob.Stop()
 
 		}
@@ -49,20 +49,25 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) StartMesure() error {
 	serviceStateDispatcher.lastRequestTime = time.Now()
 	err := serviceStateDispatcher.mesureJob.Start()
 	if err != nil {
-		return errors.New("error: Can't start mesure job\n" + err.Error())
+		stErr := "error: Can't start mesure job"
+		log.Println(stErr)
+		return errors.New(stErr)
 	}
 	return nil
 }
 func (serviceStateDispatcher *SystemMonitorDispatcher) StopMesure() error {
 	err := serviceStateDispatcher.mesureJob.Stop()
 	if err != nil {
-		return errors.New("error: Can't stop mesure job\n" + err.Error())
+		stErr := "error: Can't start mesure job"
+		log.Println(stErr)
+		return errors.New("error: Can't stop mesure job\n")
 	}
 	return nil
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
 	if !serviceStateDispatcher.mesureJob.runJob {
+		log.Println("info: start mesure cpu job")
 		serviceStateDispatcher.mesureJob.Start()
 	}
 
@@ -70,7 +75,10 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request,
 	js, err := json.Marshal(systemInfo)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return errors.New("error: Can't system state response \n" + err.Error())
+		stErr := "error: Can't create system state response"
+		log.Println(stErr)
+		responseWriter.Write(js)
+		return errors.New(stErr)
 	}
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Write(js)

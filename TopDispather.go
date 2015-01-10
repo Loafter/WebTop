@@ -3,6 +3,7 @@ package main
 import "net/http"
 import "errors"
 import "encoding/json"
+import "log"
 
 type TopResponse struct {
 	ProcessItems []ProcessItem
@@ -29,6 +30,8 @@ func (serviceStateDispatcher *TopDispatcher) Dispatch(request Request, responseW
 	case TopProcess:
 		topProcessList, err := serviceStateDispatcher.top.GetProcessList()
 		if err != nil {
+			stErr := "error get process list "
+			log.Println(stErr)
 			return errors.New("error get process list ")
 		}
 		topResponse := TopResponse{ProcessItems: topProcessList}
@@ -42,6 +45,7 @@ func (serviceStateDispatcher *TopDispatcher) Dispatch(request Request, responseW
 	case KillProcess:
 		killRequest := request.(KillRequest)
 		err := serviceStateDispatcher.top.KillProcess(killRequest.Pid)
+
 		var killResultMsg string
 		if err != nil {
 			killResultMsg = err.Error()

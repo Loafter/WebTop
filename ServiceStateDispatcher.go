@@ -3,6 +3,7 @@ package main
 import "net/http"
 import "encoding/json"
 import "errors"
+import "log"
 
 type ServiceStateRequest struct {
 	BasicRequest
@@ -24,7 +25,10 @@ func (serviceStateDispatcher *ServiceStateDispatcher) Dispatch(request Request, 
 	js, err := json.Marshal(serviceState)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return errors.New("error: Can't service state response \n" + err.Error())
+		stErr := "error: Can't service state response"
+		log.Println(stErr)
+		responseWriter.Write(js)
+		return errors.New(stErr)
 	}
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Write(js)
