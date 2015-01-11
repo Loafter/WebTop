@@ -185,13 +185,13 @@ func (top *Top) GetProcessList() ([]ProcessItem, error) {
 func (top *Top) KillProcess(pid int) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
-		stErr := "info: can't find process pid=" + string(pid)
+		stErr := "info: can't find process with pid " + strconv.Itoa(pid)
 		log.Println(stErr)
 		return errors.New(stErr)
 	}
 	err = process.Kill()
 	if err != nil {
-		stErr := "info: can't kill process pid=" + string(pid)
+		stErr := "info: can't kill process with pid " + strconv.Itoa(pid)
 		log.Println(stErr)
 		return errors.New(stErr)
 	}
