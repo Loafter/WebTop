@@ -163,7 +163,7 @@ func (top *Top) fillProcessInfo(oldTicks map[int]int64, newTicks map[int]int64, 
 
 			} else {
 				stErr := "info: can't messure cpu info for process"
-				log.Println(stErr, processItem.Name)
+				log.Println(stErr, processItem.Name, processItem.Pid)
 				processItem.Cpu = 0
 			}
 			processItems = append(processItems, processItem)
