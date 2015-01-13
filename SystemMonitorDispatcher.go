@@ -19,7 +19,7 @@ type SystemMonitorResponse struct {
 type SystemMonitorDispatcher struct {
 	lastCPUSample   CPUSample
 	lastCPUAverage  CPUAverage
-	measureJob       BatchJob
+	measureJob      BatchJob
 	lastRequestTime time.Time
 }
 
@@ -44,7 +44,7 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) measureCPU() {
 	}
 }
 
-func (serviceStateDispatcher *SystemMonitorDispatcher) Startmeasure() error {
+func (serviceStateDispatcher *SystemMonitorDispatcher) StartMeasure() error {
 	serviceStateDispatcher.measureJob.Job = serviceStateDispatcher.measureCPU
 	serviceStateDispatcher.lastRequestTime = time.Now()
 	err := serviceStateDispatcher.measureJob.Start()
