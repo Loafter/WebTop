@@ -19,7 +19,7 @@ type SystemMonitorResponse struct {
 type SystemMonitorDispatcher struct {
 	lastCPUSample   CPUSample
 	lastCPUAverage  CPUAverage
-	mesureJob       BatchJob
+	measureJob       BatchJob
 	lastRequestTime time.Time
 }
 
@@ -29,7 +29,7 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) getCPUUsage() CPUAverage 
 
 }
 
-func (serviceStateDispatcher *SystemMonitorDispatcher) mesureCPU() {
+func (serviceStateDispatcher *SystemMonitorDispatcher) measureCPU() {
 	for {
 		serviceStateDispatcher.lastCPUAverage = GetCPUAverage(serviceStateDispatcher.lastCPUSample, GetCPUSample())
 		serviceStateDispatcher.lastCPUSample = GetCPUSample()
@@ -37,38 +37,38 @@ func (serviceStateDispatcher *SystemMonitorDispatcher) mesureCPU() {
 		secondLastRequest := time.Now().Sub(serviceStateDispatcher.lastRequestTime)
 		if secondLastRequest.Seconds() > 5 {
 
-			log.Println("info: sleep mesure cpu job")
-			serviceStateDispatcher.mesureJob.Stop()
+			log.Println("info: sleep measure cpu job")
+			serviceStateDispatcher.measureJob.Stop()
 
 		}
 	}
 }
 
-func (serviceStateDispatcher *SystemMonitorDispatcher) StartMesure() error {
-	serviceStateDispatcher.mesureJob.Job = serviceStateDispatcher.mesureCPU
+func (serviceStateDispatcher *SystemMonitorDispatcher) Startmeasure() error {
+	serviceStateDispatcher.measureJob.Job = serviceStateDispatcher.measureCPU
 	serviceStateDispatcher.lastRequestTime = time.Now()
-	err := serviceStateDispatcher.mesureJob.Start()
+	err := serviceStateDispatcher.measureJob.Start()
 	if err != nil {
-		stErr := "error: Can't start mesure job"
+		stErr := "error: Can't start measure job"
 		log.Println(stErr)
 		return errors.New(stErr)
 	}
 	return nil
 }
-func (serviceStateDispatcher *SystemMonitorDispatcher) StopMesure() error {
-	err := serviceStateDispatcher.mesureJob.Stop()
+func (serviceStateDispatcher *SystemMonitorDispatcher) Stopmeasure() error {
+	err := serviceStateDispatcher.measureJob.Stop()
 	if err != nil {
-		stErr := "error: Can't start mesure job"
+		stErr := "error: Can't start measure job"
 		log.Println(stErr)
-		return errors.New("error: Can't stop mesure job\n")
+		return errors.New("error: Can't stop measure job\n")
 	}
 	return nil
 }
 
 func (serviceStateDispatcher *SystemMonitorDispatcher) Dispatch(request Request, responseWriter http.ResponseWriter, httpRequest *http.Request) error {
-	if !serviceStateDispatcher.mesureJob.runJob {
-		log.Println("info: start mesure cpu job")
-		serviceStateDispatcher.mesureJob.Start()
+	if !serviceStateDispatcher.measureJob.runJob {
+		log.Println("info: start measure cpu job")
+		serviceStateDispatcher.measureJob.Start()
 	}
 
 	systemInfo := SystemMonitorResponse{CPUUsage: serviceStateDispatcher.getCPUUsage(), MemSample: GetMemSample()}

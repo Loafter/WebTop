@@ -29,11 +29,11 @@ func (requestSelector *RequestSelector) Init() error {
 	}
 	requestSelector.selectorRequestMap[ServiceStatus] = new(ServiceStateDispatcher)
 	systemMonitorDispatcher := new(SystemMonitorDispatcher)
-	systemMonitorDispatcher.StartMesure()
+	systemMonitorDispatcher.StartMeasure()
 	requestSelector.selectorRequestMap[SystemMonitor] = systemMonitorDispatcher
 	//same dispatcher for two message
 	topProcessDispatcher := new(TopDispatcher)
-	topProcessDispatcher.StartMesure()
+	topProcessDispatcher.StartMeasure()
 	requestSelector.selectorRequestMap[TopProcess] = topProcessDispatcher
 	requestSelector.selectorRequestMap[KillProcess] = topProcessDispatcher
 	return nil

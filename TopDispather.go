@@ -63,6 +63,6 @@ func (serviceStateDispatcher *TopDispatcher) Dispatch(request Request, responseW
 	}
 	return nil
 }
-func (serviceStateDispatcher *TopDispatcher) StartMesure() {
+func (serviceStateDispatcher *TopDispatcher) StartMeasure() {
 	serviceStateDispatcher.top.StartCollectInfo()
 }
