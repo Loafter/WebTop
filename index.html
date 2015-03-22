@@ -2,345 +2,321 @@
 <html>
 
 <head>
-    <title>WebTop</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
-    <style type="text/css">
-        /* Space out content a bit */
-        
-        body {
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-        /* Everything but the jumbotron gets side spacing for mobile first views */
-        
-        .header,
-        .marketing,
-        .footer {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-        /* Custom page header */
-        
-        .header {
-            border-bottom: 1px solid #e5e5e5;
-        }
-        /* Make the masthead heading the same height as the navigation */
-        
-        .header h3 {
-            margin-top: 0;
-            margin-bottom: 0;
-            line-height: 40px;
-            padding-bottom: 19px;
-        }
-        /* Custom page footer */
-        
-        .footer {
-            padding-top: 19px;
-            color: #777;
-            border-top: 1px solid #e5e5e5;
-        }
-        /* Customize container */
-        
-        @media(min-width: 768px) {
-            .container {
-                max-width: 730px;
-            }
-        }
-        .container-narrow > hr {
-            margin: 30px 0;
-        }
-        /* Main marketing message and sign up button */
-        
-        .jumbotron {
-            text-align: center;
-            border-bottom: 1px solid #e5e5e5;
-        }
-        .jumbotron .btn {
-            font-size: 21px;
-            padding: 14px 24px;
-        }
-        /* Supporting marketing content */
-        
-        .marketing {
-            margin: 40px 0;
-        }
-        .marketing p + h4 {
-            margin-top: 28px;
-        }
-        /* Responsive: Portrait tablets and up */
-        
-        @media screen and(min-width: 768px) {
-            /* Remove the padding we set earlier */
-            
-            .header,
-            .marketing,
-            .footer {
-                padding-left: 0;
-                padding-right: 0;
-            }
-            /* Space out the masthead */
-            
-            .header {
-                margin-bottom: 30px;
-            }
-            /* Remove the bottom border on the jumbotron for visual effect */
-            
-            .jumbotron {
-                border-bottom: 0;
-            }
-        }
-        span.tab {
-            float: right
-        }
-    </style>
-    <script type="text/javascript">
-        var lastTopData = {};
-	    var minCpuUsage=0.000001 
-        var cpuData = new TimeSeries();
-        var memData = new TimeSeries();
+	<title>WebTop</title>
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
+	<style type="text/css">
+		/* Space out content a bit */
+		
+		body {
+			padding-top: 20px;
+			padding-bottom: 20px;
+		}
+		/* Everything but the jumbotron gets side spacing for mobile first views */
+		
+		.header,
+		.marketing,
+		.footer {
+			padding-left: 15px;
+			padding-right: 15px;
+		}
+		/* Custom page header */
+		
+		.header {
+			border-bottom: 1px solid #e5e5e5;
+		}
+		/* Make the masthead heading the same height as the navigation */
+		
+		.header h3 {
+			margin-top: 0;
+			margin-bottom: 0;
+			line-height: 40px;
+			padding-bottom: 19px;
+		}
+		/* Custom page footer */
+		
+		.footer {
+			padding-top: 19px;
+			color: #777;
+			border-top: 1px solid #e5e5e5;
+		}
+		/* Customize container */
+		
+		@media(min-width: 768px) {
+			.container {
+				max-width: 730px;
+			}
+		}
+		.container-narrow > hr {
+			margin: 30px 0;
+		}
+		/* Main marketing message and sign up button */
+		
+		.jumbotron {
+			text-align: center;
+			border-bottom: 1px solid #e5e5e5;
+		}
+		.jumbotron .btn {
+			font-size: 21px;
+			padding: 14px 24px;
+		}
+		/* Supporting marketing content */
+		
+		.marketing {
+			margin: 40px 0;
+		}
+		.marketing p + h4 {
+			margin-top: 28px;
+		}
+		/* Responsive: Portrait tablets and up */
+		
+		@media screen and(min-width: 768px) {
+			/* Remove the padding we set earlier */
+			
+			.header,
+			.marketing,
+			.footer {
+				padding-left: 0;
+				padding-right: 0;
+			}
+			/* Space out the masthead */
+			
+			.header {
+				margin-bottom: 30px;
+			}
+			/* Remove the bottom border on the jumbotron for visual effect */
+			
+			.jumbotron {
+				border-bottom: 0;
+			}
+		}
+		span.tab {
+			float: right
+		}
+	</style>
+	<script type="text/javascript">
+		var lastTopData = {};
+		var minCpuUsage = 0.000001
+		var cpuData = new TimeSeries();
+		var memData = new TimeSeries();
 
-        function createTimeline() {
-            var chart = new SmoothieChart({
-                maxValue: 100,
-                minValue: 0,
-                millisPerPixel: 100,
-                grid: {
-                    fillStyle: '#3e444c'
-                }
-            });
-            chart.addTimeSeries(cpuData, {
-                lineWidth: 2,
-                strokeStyle: '#a0afc3',
-                fillStyle: 'rgba(112,127,146,0.30)'
-            });
-            chart.addTimeSeries(memData, {
-                lineWidth: 2,
-                strokeStyle: '#b0afc3',
-                fillStyle: 'rgba(212,127,146,0.30)'
-            });
-            chart.streamTo(document.getElementById("cpu-mem-chart"));
-        }
+		function createTimeline() {
+			var chart = new SmoothieChart({
+				maxValue: 100,
+				minValue: 0,
+				millisPerPixel: 100,
+				grid: {
+					fillStyle: '#3e444c'
+				}
+			});
+			chart.addTimeSeries(cpuData, {
+				lineWidth: 2,
+				strokeStyle: '#a0afc3',
+				fillStyle: 'rgba(112,127,146,0.30)'
+			});
+			chart.addTimeSeries(memData, {
+				lineWidth: 2,
+				strokeStyle: '#b0afc3',
+				fillStyle: 'rgba(212,127,146,0.30)'
+			});
+			chart.streamTo(document.getElementById("cpu-mem-chart"));
+		}
 
-        function updateChart() {
-            var lastCpuData = {
-                Total: 0,
-                Idle: 0
-            };
-            $.ajax({
-                url: "/webtop",
-                type: "POST",
-                data: '{\"Type\": \"1\"}',
-                dataType: "json"
-            }).done(function(jsonData) {
+		function updateChart() {
+			var lastCpuData = {
+				Total: 0,
+				Idle: 0
+			};
+			$.ajax({
+				url: "/webtop",
+				type: "POST",
+				data: '{\"Type\": \"1\"}',
+				dataType: "json"
+			}).done(function(jsonData) {
+				var cpuLoad = jsonData.CPUUsage.UserPct;
+				var MemLoad = ((jsonData.MemSample.MemUsed) / jsonData.MemSample.MemTotal) * 100;
+				lastCpuData = jsonData.CpuSample;
+				cpuData.append(new Date().getTime(), cpuLoad);
+				memData.append(new Date().getTime(), MemLoad);
+			})
+		}
 
-                var cpuLoad = jsonData.CPUUsage.UserPct;
-                var MemLoad = ((jsonData.MemSample.MemUsed) / jsonData.MemSample.MemTotal) * 100;
-                lastCpuData = jsonData.CpuSample;
-                cpuData.append(new Date().getTime(), cpuLoad);
-                memData.append(new Date().getTime(), MemLoad);
-            })
-        }
+		function updateStatistic() {
+			var lastCpuData = {
+				Total: 0,
+				Idle: 0
+			};
+			$.ajax({
+				url: "/webtop",
+				type: "POST",
+				data: '{\"Type\": \"1\"}',
+				dataType: "json"
+			}).done(function(jsonData) {
+				//cpu table
+				$("#user-load-cpu").text(jsonData.CPUUsage.UserPct.toFixed(1) + ' %');
+				$("#system-load-cpu").text(jsonData.CPUUsage.SystemPct.toFixed(1) + ' %');
+				$("#idle-load-cpu").text(jsonData.CPUUsage.IdlePct.toFixed(1) + ' %');
+				$("#guest-load-cpu").text(jsonData.CPUUsage.GuestPct.toFixed(1) + ' %');
+				$("#low-load-cpu").text(jsonData.CPUUsage.IowaitPct.toFixed(1) + ' %');
+				//mem table	
+				$("#buffers-mem").text((jsonData.MemSample.Buffers * 0.000976562).toFixed(1) + ' Mb')
+				$("#used-mem").text((jsonData.MemSample.MemUsed * 0.000976562).toFixed(1) + ' Mb')
+				$("#free-mem").text((jsonData.MemSample.MemFree * 0.000976562).toFixed(1) + ' Mb')
+				$("#total-mem").text((jsonData.MemSample.MemTotal * 0.000976562).toFixed(1) + ' Mb')
+				$("#cached-mem").text((jsonData.MemSample.Cached * 0.000976562).toFixed(1) + ' Mb')
+			})
+		}
 
-        function updateStatistic() {
-            var lastCpuData = {
-                Total: 0,
-                Idle: 0
-            };
-            $.ajax({
-                url: "/webtop",
-                type: "POST",
-                data: '{\"Type\": \"1\"}',
-                dataType: "json"
-            }).done(function(jsonData) {
-                //cpu table
-                $("#user-load-cpu").text(jsonData.CPUUsage.UserPct.toFixed(1) + ' %');
-                $("#system-load-cpu").text(jsonData.CPUUsage.SystemPct.toFixed(1) + ' %');
-                $("#idle-load-cpu").text(jsonData.CPUUsage.IdlePct.toFixed(1) + ' %');
-                $("#guest-load-cpu").text(jsonData.CPUUsage.GuestPct.toFixed(1) + ' %');
-                $("#low-load-cpu").text(jsonData.CPUUsage.IowaitPct.toFixed(1) + ' %');
-                //mem table	
-                $("#buffers-mem").text((jsonData.MemSample.Buffers * 0.000976562).toFixed(1) + ' Mb')
-                $("#used-mem").text((jsonData.MemSample.MemUsed * 0.000976562).toFixed(1) + ' Mb')
-                $("#free-mem").text((jsonData.MemSample.MemFree * 0.000976562).toFixed(1) + ' Mb')
-                $("#total-mem").text((jsonData.MemSample.MemTotal * 0.000976562).toFixed(1) + ' Mb')
-                $("#cached-mem").text((jsonData.MemSample.Cached * 0.000976562).toFixed(1) + ' Mb')
-            })
-        }
+		function addProcessToTable(processInfo) {
+			pid = processInfo.Pid
+			Name = processInfo.Name
+			User = processInfo.User
+			Cpu = processInfo.Cpu.toFixed(1)
+			Mem = (processInfo.Memory * 0.000976562).toFixed(1)
+			inerHtml = ""
+			inerHtml = inerHtml.concat('<tr onclick="onClickKill(this)" id="pr-items' + pid + '"><td id="pid' + pid + '">' + pid + '</td><td id="name-id' + pid + '">' + Name + '</td><td id="user-id' + pid + '">' + User + '</td><td id="cpu-id' + pid + '">' + Cpu + '</td><td id="memory-id' + pid + '">' + Mem + '</td></tr>')
+			$("#process-list-table").append(inerHtml)
+		}
 
-        function addProcessToTable(processInfo) {
-            pid = processInfo.Pid
-            Name = processInfo.Name
-            User = processInfo.User
-            Cpu = processInfo.Cpu.toFixed(1)
-            Mem = (processInfo.Memory* 0.000976562).toFixed(1)
-            inerHtml = ""
-            inerHtml = inerHtml.concat('<tr onclick="onClickKill(this)" id="pr-items' + pid + '"><td id="pid' + pid + '">' + pid + '</td><td id="name-id' + pid + '">' + Name + '</td><td id="user-id' + pid + '">' + User + '</td><td id="cpu-id' + pid + '">' + Cpu + '</td><td id="memory-id' + pid + '">' + Mem + '</td></tr>')
-            $("#process-list-table").append(inerHtml)
+		function updateProcessInTable(processInfo) {
+			pid = processInfo.Pid
+			Name = processInfo.Name
+			User = processInfo.User
+			Cpu = (processInfo.Cpu * 100).toFixed(1)
+			Memory = (processInfo.Memory * 0.000976562).toFixed(1)
+			$("#pid" + pid).text(pid)
+			$("#name-id" + pid).text(Name)
+			$("#user-id" + pid).text(User)
+			$("#cpu-id" + pid).text(Cpu)
+			$("#memory-id" + pid).text(Memory)
+		}
 
-        }
+		function deleteProcessFromTable(pid) {
+			rowId = "#pr-items" + pid
+			$(rowId).remove()
+		}
 
-        function updateProcessInTable(processInfo) {
-            pid = processInfo.Pid
-            Name = processInfo.Name
-            User = processInfo.User
-            Cpu = (processInfo.Cpu*100).toFixed(1)
-            Memory = (processInfo.Memory* 0.000976562).toFixed(1)
-            $("#pid" + pid).text(pid)
-            $("#name-id" + pid).text(Name)
-            $("#user-id" + pid).text(User)
-            $("#cpu-id" + pid).text(Cpu)
-            $("#memory-id" + pid).text(Memory)
-        }
-
-        function deleteProcessFromTable(pid) {
-            rowId = "#pr-items" + pid
-            $(rowId).remove()
-        }
-
-        function updateTop() {
-            $.ajax({
-                url: "/webtop",
-                type: "POST",
-                data: '{\"Type\": \"2\"}',
-                dataType: "json"
-            }).done(function(jsonData) {
-                var topDic = {};
-                for (index in jsonData.ProcessItems) {
-                    topItems = jsonData.ProcessItems[index]
-					if(minCpuUsage<=topItems.Cpu){
-                     	topDic[topItems.Pid] = topItems;
+		function updateTop() {
+			$.ajax({
+				url: "/webtop",
+				type: "POST",
+				data: '{\"Type\": \"2\"}',
+				dataType: "json"
+			}).done(function(jsonData) {
+				var topDic = {};
+				for (index in jsonData.ProcessItems) {
+					topItems = jsonData.ProcessItems[index]
+					if (minCpuUsage <= topItems.Cpu) {
+						topDic[topItems.Pid] = topItems;
 					}
-                }
-                console.log("_______________________________________________________________________________________________________________________________________________________________________________________________")
-                if (Object.keys(lastTopData).length == 0) {
-                    lastTopData = topDic
-                    console.log("full new table")
-                    for (index in topDic) {
-                        addProcessToTable(topDic[index])
-                    }
-                } else {
-                    itemsforRemove = lastTopData
-                    for (index in topDic) {
-                        pid = topDic[index].Pid
-                        if (!(lastTopData[pid] === undefined)) {
-                            console.log("updated " + JSON.stringify(topDic[index].Pid))
-                            updateProcessInTable(topDic[index])
-                        } else {
-                            console.log("added " + JSON.stringify(topDic[index].Pid))
-                            addProcessToTable(topDic[index])
-                        }
-                    }
-                    for (index in itemsforRemove) {
-                        if ((topDic[index] === undefined)) {
-                            console.log("deleted " + JSON.stringify(itemsforRemove[index].Pid))
-                            deleteProcessFromTable(itemsforRemove[index].Pid)
-                        }
-                    }
-                }
-                lastTopData = topDic
-            })
-        }
+				}
+				console.log("_______________________________________________________________________________________________________________________________________________________________________________________________")
+				if (Object.keys(lastTopData).length == 0) {
+					lastTopData = topDic
+					console.log("full new table")
+					for (index in topDic) {
+						addProcessToTable(topDic[index])
+					}
+				} else {
+					itemsforRemove = lastTopData
+					for (index in topDic) {
+						pid = topDic[index].Pid
+						if (!(lastTopData[pid] === undefined)) {
+							console.log("updated " + JSON.stringify(topDic[index].Pid))
+							updateProcessInTable(topDic[index])
+						} else {
+							console.log("added " + JSON.stringify(topDic[index].Pid))
+							addProcessToTable(topDic[index])
+						}
+					}
+					for (index in itemsforRemove) {
+						if ((topDic[index] === undefined)) {
+							console.log("deleted " + JSON.stringify(itemsforRemove[index].Pid))
+							deleteProcessFromTable(itemsforRemove[index].Pid)
+						}
+					}
+				}
+				lastTopData = topDic
+			})
+		}
 
-        function onDocumentLoad() {
-            createTimeline()
-            setInterval(updateChart, 500);
-            setInterval(updateStatistic, 700);
-            setInterval(updateTop, 700)
-        }
-		
+		function onDocumentLoad() {
+			createTimeline()
+			setInterval(updateChart, 500);
+			setInterval(updateStatistic, 700);
+			setInterval(updateTop, 700)
+		}
+
 		function onClickKill(e) {
-			pid=e.id.substring(8)
- 			$.ajax({
-                url: "/webtop",
-                type: "POST",
-                data: '{\"Type\": \"3\",\"Pid": '+pid+'}',
-                dataType: "json"
-            })
-        }
+			pid = e.id.substring(8)
+			$.ajax({
+				url: "/webtop",
+				type: "POST",
+				data: '{\"Type\": \"3\",\"Pid": ' + pid + '}',
+				dataType: "json"
+			})
+		}
+
 		function switchUsage() {
-		if(minCpuUsage==0.0){
-			minCpuUsage=0.000001
-			$("#cpu-minum").text(">0")
+			if (minCpuUsage == 0.0) {
+				minCpuUsage = 0.000001
+				$("#cpu-minum").text(">0")
+			} else if (minCpuUsage == 0.000001) {
+				minCpuUsage = 0.25
+				$("#cpu-minum").text(">25")
+			} else if (minCpuUsage == 0.25) {
+				minCpuUsage = 0.5
+				$("#cpu-minum").text(">50")
+			} else if (minCpuUsage == 0.5) {
+				minCpuUsage = 0.75
+				$("#cpu-minum").text(">75")
+			} else if (minCpuUsage == 0.75) {
+				minCpuUsage = 0
+				$("#cpu-minum").text(">=0")
+			}
 		}
-		else if(minCpuUsage==0.000001){
-			minCpuUsage=0.25
-			$("#cpu-minum").text(">25")
-		}
-		else if(minCpuUsage==0.25){
-			minCpuUsage=0.5
-			$("#cpu-minum").text(">50")
-		}
-		else if(minCpuUsage==0.5){
-			minCpuUsage=0.75
-			$("#cpu-minum").text(">75")
-		}
-		else if(minCpuUsage==0.75){
-			minCpuUsage=0
-			 $("#cpu-minum").text(">=0")	
-		}
-		}
-		
-    </script>
+	</script>
 </head>
 
 <body onload="onDocumentLoad()">
-    <div class="container">
-        <h1>WebTop system monitor</h1>
-        <div class="panel-footer">System state
-        </div>
-        <div class="panel-body" data-ds-editmark="true">
-            <div class="row">
-                <div class="col-md-4">
-                    <span class="label label-default">Cpu load</span>
-                    <p>User:<span class="tab" id="user-load-cpu">10%</span>
-                    </p>
-                    <p>System:<span class="tab" id="system-load-cpu">10%</span>
-                    </p>
-                    <p>Idle:<span class="tab" id="idle-load-cpu">10%</span>
-                    </p>
-                    <p>Guest:<span class="tab" id="guest-load-cpu">10%</span>
-                    </p>
-                    <p>Low:<span class="tab" id="low-load-cpu">10%</span>
-                    </p>
-                </div>
-                <div class="col-md-4">
-                    <span class="label label-default">System info</span>
-                    <p>Memory used:<span class="tab" id="used-mem">10%</span>
-                    </p>
-                    <p>Memory free:<span class="tab" id="free-mem">10%</span>
-                    </p>
-                    <p>Buffers:<span class="tab" id="buffers-mem">10%</span>
-                    </p>
-                    <p>Cached:<span class="tab" id="cached-mem">10%</span>
-                    </p>
-                    <p>Memory total:<span class="tab" id="total-mem">10%</span>
-                    </p>
-                </div>
-                <div class="col-md-4">
-                    <span class="label label-default">Cpu graph</span>
-                    <span class="tab"> <canvas id="cpu-mem-chart" width="218" height="138"></canvas></span>
-                </div>
-            </div>
-        </div>
-        <div class="panel-footer">Process list
-        </div>
-        <table class="table table-bordered table-condensed table-hover table-striped">
-            <thead>
-                <tr>
-           		 	<th>Pid</th>
-            			<th>Process name</th>
-            			<th>User id</th>
-            			<th>Cpu <span onclick="switchUsage()" id="cpu-minum">>=0</span>%</th>
-            			<th>Mem Mb.</th>
-                </tr>
-            </thead>
-            <tbody id="process-list-table">
-            </tbody>
-        </table>
-        <div class="panel-body" data-ds-editmark="true"></div>
-    </div>
+	<div class="container">
+		<h1>WebTop system monitor</h1>
+		<div class="panel-footer">System state </div>
+		<div class="panel-body" data-ds-editmark="true">
+			<div class="row">
+				<div class="col-md-4"> <span class="label label-default">Cpu load</span>
+					<p>User:<span class="tab" id="user-load-cpu">10%</span> </p>
+					<p>System:<span class="tab" id="system-load-cpu">10%</span> </p>
+					<p>Idle:<span class="tab" id="idle-load-cpu">10%</span> </p>
+					<p>Guest:<span class="tab" id="guest-load-cpu">10%</span> </p>
+					<p>Low:<span class="tab" id="low-load-cpu">10%</span> </p>
+				</div>
+				<div class="col-md-4"> <span class="label label-default">System info</span>
+					<p>Memory used:<span class="tab" id="used-mem">10%</span> </p>
+					<p>Memory free:<span class="tab" id="free-mem">10%</span> </p>
+					<p>Buffers:<span class="tab" id="buffers-mem">10%</span> </p>
+					<p>Cached:<span class="tab" id="cached-mem">10%</span> </p>
+					<p>Memory total:<span class="tab" id="total-mem">10%</span> </p>
+				</div>
+				<div class="col-md-4"> <span class="label label-default">Cpu graph</span> <span class="tab"> <canvas id="cpu-mem-chart" width="218" height="138"></canvas></span> </div>
+			</div>
+		</div>
+		<div class="panel-footer">Process list </div>
+		<table class="table table-bordered table-condensed table-hover table-striped">
+			<thead>
+				<tr>
+					<th>Pid</th>
+					<th>Process name</th>
+					<th>User id</th>
+					<th>Cpu <span onclick="switchUsage()" id="cpu-minum">>=0</span>%</th>
+					<th>Mem Mb.</th>
+				</tr>
+			</thead>
+			<tbody id="process-list-table"> </tbody>
+		</table>
+		<div class="panel-body" data-ds-editmark="true"></div>
+	</div>
 </body>

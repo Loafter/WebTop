@@ -5,6 +5,6 @@ PREFIX=/usr/
 $(PROGRAMM):
 	$(GO) build -o $(PROGRAMM)
 install: $(PROGRAMM)
-	cp -rfv ./wtop ./index.html $(PREFIX)/bin
+	cp -rfv ./wtop  $(PREFIX)/bin
 clean:
 	rm -fv ./wtop
