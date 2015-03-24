@@ -20,11 +20,17 @@ func (serviceState *TopJsonService) Start(listenPort int) error {
 	serviceState.requestSelector = RequestSelector{}
 	serviceState.requestSelector.Init()
 	fmt.Println(":" + strconv.Itoa(listenPort))
+	http.HandleFunc("/", serviceState.Redirect)
 	http.HandleFunc("/webtop", serviceState.ServeHTTP)
 	http.HandleFunc("/index.html", serviceState.ServePage)
 	http.HandleFunc("/samplejson", serviceState.ReturnDummyReq)
 	retVal := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil)
 	return retVal
+}
+
+//redirect all the wrong unplanned queries to index
+func (service *TopJsonService) Redirect(responseWriter http.ResponseWriter, request *http.Request) {
+	http.Redirect(responseWriter, request, "/index.html", 301)
 }
 
 //serve http responce in different thread
